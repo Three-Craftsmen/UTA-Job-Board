@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 import { type NextPage } from "next";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
+
 import LoginIcon from "@mui/icons-material/Login";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LaunchIcon from "@mui/icons-material/Launch";
@@ -11,6 +13,7 @@ const Home: NextPage = () => {
 
   return (
     <>
+      {/* Document Head: Contains Metadata */}
       <Head>
         {/* Primary Meta Tags */}
         <title>GMU | UTA Application Portal</title>
@@ -44,12 +47,16 @@ const Home: NextPage = () => {
         />
         <meta property="twitter:image" content="images/preview.png"></meta>
       </Head>
+      {/* Document Head: Contains Metadata */}
+      {/* Main: Main Content rendered in the HTML Body*/}
+      <main>
+        {/* User Logged In: Display Main App Content */}
+        {sessionData !== null && <MainContent />}
 
-      {/* User Logged In */}
-      {sessionData !== null && <MainContent />}
-
-      {/* User Not Logged In */}
-      {sessionData === null && <Login />}
+        {/* User Not Logged In: Display Login Page */}
+        {sessionData === null && <LoginPage />}
+      </main>
+      {/* Main: Main Content rendered in the HTML Body*/}
     </>
   );
 };
@@ -57,76 +64,68 @@ const Home: NextPage = () => {
 export default Home;
 
 /**
- * EFFECTS: Displays a full-height page.
- *          This is where the main app content is displayed and able to be interacted with.
- * @returns TSX Template
- */
-const MainContent = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
-  return (
-    <>
-      <MainHeader />
-      <main
-        data-theme="gmuTheme"
-        className="flex min-h-screen flex-col items-center justify-center bg-base-100 bg-gradient-to-b"
-      >
-        <h1 className="text-3xl">UTA Job Board</h1>
-        <a href="" className="btn-primary btn w-40">
-          Primary
-        </a>
-        <a href="" className="btn-secondary btn w-40">
-          Secondary
-        </a>
-        <a href="" className="btn-accent btn w-40">
-          Accent
-        </a>
-        <a href="" className="btn-neutral btn w-40">
-          Nuetral
-        </a>
-        <div className="divider"></div>
-        <a href="" className="btn-info btn w-40">
-          Info
-        </a>
-        <a href="" className="btn-success btn w-40">
-          Success
-        </a>
-        <a href="" className="btn-warning btn w-40">
-          Warning
-        </a>
-        <a href="" className="btn-error btn w-40">
-          Error
-        </a>
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-2xl text-white">
-            {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-          </p>
-          <AuthShowcase />
-        </div>
-      </main>
-    </>
-  );
-};
-
-/**
  * EFFECTS: Displays a fixed nav element to the top of the screen.
  * @returns TSX Template
  */
-const MainHeader = () => {
+const Header = () => {
+  const { data: sessionData } = useSession();
+
   return (
-    <nav className="navbar fixed z-50 bg-base-200 bg-opacity-20 p-4 backdrop-blur-3xl">
+    <nav className="navbar z-50 bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl sm:p-4">
       <div className="flex-1">
-        <a className="btn-ghost btn text-xl normal-case">Application Portal</a>
+        <a className="btn-disabled btn-ghost btn-md btn text-lg normal-case sm:text-xl">
+          {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
+        </a>
       </div>
       <div className="flex-end">
-        <a className="btn-ghost btn text-xl normal-case" href="#">
-          Docs <LaunchIcon />
-        </a>
+        <div className="dropdown-end dropdown">
+          <label tabIndex={0} className="btn-ghost btn-circle avatar btn">
+            <div className="w-10 rounded-full">
+              <img
+                src={sessionData?.user?.image || ""}
+                alt={`${sessionData?.user?.name || ""}'s profile picture`}
+              />
+            </div>
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu rounded-box menu-sm mt-3 w-32 bg-base-100 p-2 shadow"
+          >
+            <li>
+              <a className="justify-between sm:text-lg">Profile</a>
+            </li>
+            <li>
+              <a className="sm:text-lg" onClick={() => void signOut()}>
+                Logout
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   );
 };
 
+/**
+ * EFFECTS: Displays a full-height page.
+ *          This is where the main app content is displayed and able to be interacted with.
+ * @returns TSX Template
+ */
+const MainContent = () => {
+  return (
+    <>
+      <Header />
+      <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
+        <div className="flex max-w-4xl flex-col items-center gap-12">
+          <h1 className="text-2xl font-bold sm:text-3xl">UTA Job Board</h1>
+          <p className="">Welcome!</p>
+        </div>
+      </section>
+    </>
+  );
+};
+
+/* TODO: Delete Later, this is not needed anymore, nor is the example tRPC router. */
 const AuthShowcase: React.FC = () => {
   const { data: sessionData } = useSession();
 
@@ -155,26 +154,42 @@ const AuthShowcase: React.FC = () => {
  * EFFECTS: Displays a full-height login page that has the capability to redirect the user to sign in.
  * @returns TSX Template
  */
-const Login = () => {
+const LoginPage = () => {
   return (
     <>
-      <LoginHeader />
-      <main className="grid min-h-screen w-full place-items-center bg-base-100">
+      {/* Login Header */}
+      <header className="navbar bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl sm:p-4">
+        <div className="flex-1">
+          <a className="btn-disabled btn-ghost btn-md btn text-lg normal-case sm:text-xl">
+            Application Portal
+          </a>
+        </div>
+        <div className="flex-end">
+          <a
+            className="btn-ghost btn text-lg normal-case text-secondary sm:text-xl"
+            href="#"
+          >
+            Docs <LaunchIcon style={{ width: "24px", height: "24px" }} />
+          </a>
+        </div>
+      </header>
+      {/* Login Header */}
+      <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
         <div className="flex flex-col items-center gap-12 p-4">
-          <div className="grid w-full max-w-2xl place-items-center">
-            <div className="flex flex-col pt-20">
-              <h1 className="text-center text-2xl font-bold sm:text-3xl md:text-4xl">
-                {`Undergraduate Teaching Assistantships`}
-              </h1>
-              <p className="pt-6 text-center text-sm sm:text-start sm:indent-8 sm:text-lg">{`Undergraduate Teaching Assistants are current undergraduate students who assist in courses they've successfully completed at Mason. It is an enriching way to hone your skills, help others survive and thrive, and get paid a bit along the way. Our UTAs are a large part of our students' success in early courses. We welcome current undergraduate students to apply after completing CS courses here at Mason!`}</p>
-              <br />
-              <p className="text-center text-sm sm:text-lg">{`Now Accepting Summer and Fall 2023 Applications!`}</p>
-            </div>
+          {/* Overview Text */}
+          <div className="flex max-w-4xl flex-col">
+            <h1 className="text-center text-2xl font-bold sm:text-3xl md:text-4xl lg:text-4xl">
+              {`Undergraduate Teaching Assistantships`}
+            </h1>
+            <p className="max-w-3xl pt-6 indent-6 text-sm sm:text-lg">{`Undergraduate Teaching Assistants are current undergraduate students who assist in courses they've successfully completed at Mason. It is an enriching way to hone your skills, help others survive and thrive, and get paid a bit along the way. Our UTAs are a large part of our students' success in early courses. We welcome current undergraduate students to apply after completing CS courses here at Mason!`}</p>
+            <br />
+            <b className="text-center text-sm sm:text-lg">{`Now Accepting Summer and Fall 2023 Applications!`}</b>
           </div>
+          {/* Overview Text */}
           {/* Login Card */}
           <div className="card h-60 w-full max-w-sm bg-base-200 bg-opacity-20 backdrop-blur-3xl">
             <div className="card-body items-center gap-8">
-              <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
+              <h2 className="text-2xl font-bold sm:text-3xl md:text-3xl">
                 Login with GitHub
               </h2>
               <h3 className="text-3xl text-secondary">
@@ -190,26 +205,7 @@ const Login = () => {
           </div>
           {/* Login Card */}
         </div>
-      </main>
+      </section>
     </>
-  );
-};
-
-/**
- * EFFECTS: Displays a fixed nav element to the top of the screen.
- * @returns TSX Template
- */
-const LoginHeader = () => {
-  return (
-    <nav className="navbar fixed z-50 bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl">
-      <div className="flex-1">
-        <a className="btn-ghost btn text-lg normal-case">Application Portal</a>
-      </div>
-      <div className="flex-end">
-        <a className="btn-ghost btn text-lg normal-case" href="#">
-          Docs <LaunchIcon />
-        </a>
-      </div>
-    </nav>
   );
 };

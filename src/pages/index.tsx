@@ -65,43 +65,65 @@ const MainContent = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
-    <main
-      data-theme="gmuTheme"
-      className="flex min-h-screen flex-col items-center justify-center bg-base-100 bg-gradient-to-b"
-    >
-      <h1 className="text-3xl">UTA Job Board</h1>
-      <a href="" className="btn-primary btn w-40">
-        Primary
-      </a>
-      <a href="" className="btn-secondary btn w-40">
-        Secondary
-      </a>
-      <a href="" className="btn-accent btn w-40">
-        Accent
-      </a>
-      <a href="" className="btn-neutral btn w-40">
-        Nuetral
-      </a>
-      <div className="divider"></div>
-      <a href="" className="btn-info btn w-40">
-        Info
-      </a>
-      <a href="" className="btn-success btn w-40">
-        Success
-      </a>
-      <a href="" className="btn-warning btn w-40">
-        Warning
-      </a>
-      <a href="" className="btn-error btn w-40">
-        Error
-      </a>
-      <div className="flex flex-col items-center gap-2">
-        <p className="text-2xl text-white">
-          {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-        </p>
-        <AuthShowcase />
+    <>
+      <MainHeader />
+      <main
+        data-theme="gmuTheme"
+        className="flex min-h-screen flex-col items-center justify-center bg-base-100 bg-gradient-to-b"
+      >
+        <h1 className="text-3xl">UTA Job Board</h1>
+        <a href="" className="btn-primary btn w-40">
+          Primary
+        </a>
+        <a href="" className="btn-secondary btn w-40">
+          Secondary
+        </a>
+        <a href="" className="btn-accent btn w-40">
+          Accent
+        </a>
+        <a href="" className="btn-neutral btn w-40">
+          Nuetral
+        </a>
+        <div className="divider"></div>
+        <a href="" className="btn-info btn w-40">
+          Info
+        </a>
+        <a href="" className="btn-success btn w-40">
+          Success
+        </a>
+        <a href="" className="btn-warning btn w-40">
+          Warning
+        </a>
+        <a href="" className="btn-error btn w-40">
+          Error
+        </a>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-2xl text-white">
+            {hello.data ? hello.data.greeting : "Loading tRPC query..."}
+          </p>
+          <AuthShowcase />
+        </div>
+      </main>
+    </>
+  );
+};
+
+/**
+ * EFFECTS: Displays a fixed nav element to the top of the screen.
+ * @returns TSX Template
+ */
+const MainHeader = () => {
+  return (
+    <nav className="navbar fixed z-50 bg-base-200 bg-opacity-20 p-4 backdrop-blur-3xl">
+      <div className="flex-1">
+        <a className="btn-ghost btn text-xl normal-case">Application Portal</a>
       </div>
-    </main>
+      <div className="flex-end">
+        <a className="btn-ghost btn text-xl normal-case" href="#">
+          Docs <LaunchIcon />
+        </a>
+      </div>
+    </nav>
   );
 };
 
@@ -137,12 +159,17 @@ const Login = () => {
   return (
     <>
       <LoginHeader />
-      <main className="grid min-h-screen w-screen place-items-center bg-base-100">
-        <div className="flex max-w-6xl flex-col gap-12 p-4 lg:flex-row lg:gap-20">
-          <div className="grid w-full max-w-lg place-items-center">
-            <h1 className="pt-12 text-center text-3xl md:text-4xl">
-              Sign up and become a UTA today.
-            </h1>
+      <main className="grid min-h-screen w-full place-items-center bg-base-100">
+        <div className="flex flex-col items-center gap-12 p-4">
+          <div className="grid w-full max-w-2xl place-items-center">
+            <div className="flex flex-col pt-20">
+              <h1 className="text-center text-2xl font-bold sm:text-3xl md:text-4xl">
+                {`Undergraduate Teaching Assistantships`}
+              </h1>
+              <p className="pt-6 text-center text-sm sm:text-start sm:indent-8 sm:text-lg">{`Undergraduate Teaching Assistants are current undergraduate students who assist in courses they've successfully completed at Mason. It is an enriching way to hone your skills, help others survive and thrive, and get paid a bit along the way. Our UTAs are a large part of our students' success in early courses. We welcome current undergraduate students to apply after completing CS courses here at Mason!`}</p>
+              <br />
+              <p className="text-center text-sm sm:text-lg">{`Now Accepting Summer and Fall 2023 Applications!`}</p>
+            </div>
           </div>
           {/* Login Card */}
           <div className="card h-60 w-full max-w-sm bg-base-200 bg-opacity-20 backdrop-blur-3xl">
@@ -174,12 +201,12 @@ const Login = () => {
  */
 const LoginHeader = () => {
   return (
-    <nav className="navbar fixed z-50 bg-base-200 bg-opacity-20 p-4 backdrop-blur-3xl">
+    <nav className="navbar fixed z-50 bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl">
       <div className="flex-1">
-        <a className="btn-ghost btn text-xl normal-case">Application Portal</a>
+        <a className="btn-ghost btn text-lg normal-case">Application Portal</a>
       </div>
       <div className="flex-end">
-        <a className="btn-ghost btn text-xl normal-case" href="#">
+        <a className="btn-ghost btn text-lg normal-case" href="#">
           Docs <LaunchIcon />
         </a>
       </div>

@@ -4,9 +4,17 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "src/components/ui/Tabs";
+
 import LoginIcon from "@mui/icons-material/Login";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LaunchIcon from "@mui/icons-material/Launch";
+import { ChangeEvent, useState } from "react";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -117,8 +125,8 @@ const MainContent = () => {
       <Header />
       <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
         <div className="flex max-w-4xl flex-col items-center gap-12">
-          <h1 className="text-2xl font-bold sm:text-3xl">UTA Job Board</h1>
-          <p className="">Welcome!</p>
+          <h1 className="text-2xl font-bold sm:text-5xl">UTA Job Board</h1>
+          <FormTabs />
         </div>
       </section>
     </>
@@ -207,5 +215,280 @@ const LoginPage = () => {
         </div>
       </section>
     </>
+  );
+};
+
+const FormTabs = () => {
+  return (
+    <section className="grid place-content-center place-items-center">
+      <Tabs defaultValue="general" className="w-full max-w-2xl p-4">
+        <TabsList className="flex flex-row gap-12">
+          <TabsTrigger value="general" className="tab tab-lg">
+            General
+          </TabsTrigger>
+          <TabsTrigger value="grades" className="tab tab-lg">
+            Grades
+          </TabsTrigger>
+          <TabsTrigger value="times" className="tab tab-lg">
+            Times
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="general">
+          <GeneralForm />
+        </TabsContent>
+        <TabsContent value="grades">
+          <GradesForm />
+        </TabsContent>
+        <TabsContent value="times">
+          <TimesForm />
+        </TabsContent>
+      </Tabs>
+    </section>
+  );
+};
+
+const GeneralForm = () => {
+  const [success, setSuccess] = useState(false);
+
+  const [details, setDetails] = useState({
+    first: "",
+    last: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setDetails((prev) => {
+      return { ...prev, [name]: value };
+    });
+  };
+
+  return (
+    <div className="grid place-content-center pt-12">
+      <h1 className="pb-12 text-center text-4xl font-bold md:text-5xl">{`General Info:`}</h1>
+      {/* Form Container */}
+      <form className="flex max-w-2xl flex-col gap-2 p-2">
+        <div className="flex flex-row gap-1">
+          <input
+            name="first"
+            type="text"
+            placeholder="First Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="last"
+            type="text"
+            placeholder="Last Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <textarea
+            name="message"
+            onChange={handleChange}
+            className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
+            placeholder="New Applicants: Why do you want to be a UTA?"
+          ></textarea>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className={`btn w-full rounded-none font-sans font-medium normal-case ${
+              details.first === "" &&
+              details.last === "" &&
+              details.email === ""
+                ? "btn-disabled cursor-no-drop"
+                : "btn"
+            }`}
+          >
+            {details.first === "" && details.last === "" && details.email === ""
+              ? "Start typing..."
+              : "Submit"}
+          </button>
+        </div>
+        {success && (
+          <p className="text-md p-2 text-center font-medium sm:text-lg">{`Sent.`}</p>
+        )}
+      </form>
+      {/* Form Container */}
+    </div>
+  );
+};
+
+const GradesForm = () => {
+  const [success, setSuccess] = useState(false);
+
+  const [details, setDetails] = useState({
+    first: "",
+    last: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setDetails((prev) => {
+      return { ...prev, [name]: value };
+    });
+  };
+
+  return (
+    <div className="grid place-content-center pt-12">
+      <h1 className="pb-12 text-center text-4xl font-bold md:text-5xl">{`Grades:`}</h1>
+      {/* Form Container */}
+      <form className="flex max-w-2xl flex-col gap-2 p-2">
+        <div className="flex flex-row gap-1">
+          <input
+            name="first"
+            type="text"
+            placeholder="First Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="last"
+            type="text"
+            placeholder="Last Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <textarea
+            name="message"
+            onChange={handleChange}
+            className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
+            placeholder="New Applicants: Why do you want to be a UTA?"
+          ></textarea>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className={`btn w-full rounded-none font-sans font-medium normal-case ${
+              details.first === "" &&
+              details.last === "" &&
+              details.email === ""
+                ? "btn-disabled cursor-no-drop"
+                : "btn"
+            }`}
+          >
+            {details.first === "" && details.last === "" && details.email === ""
+              ? "Start typing..."
+              : "Submit"}
+          </button>
+        </div>
+        {success && (
+          <p className="text-md p-2 text-center font-medium sm:text-lg">{`Sent.`}</p>
+        )}
+      </form>
+      {/* Form Container */}
+    </div>
+  );
+};
+
+const TimesForm = () => {
+  const [success, setSuccess] = useState(false);
+
+  const [details, setDetails] = useState({
+    first: "",
+    last: "",
+    email: "",
+    message: "",
+  });
+
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setDetails((prev) => {
+      return { ...prev, [name]: value };
+    });
+  };
+
+  return (
+    <div className="grid place-content-center pt-12">
+      <h1 className="pb-12 text-center text-4xl font-bold md:text-5xl">{`Times:`}</h1>
+      {/* Form Container */}
+      <form className="flex max-w-2xl flex-col gap-2 p-2">
+        <div className="flex flex-row gap-1">
+          <input
+            name="first"
+            type="text"
+            placeholder="First Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="last"
+            type="text"
+            placeholder="Last Name"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div>
+          <textarea
+            name="message"
+            onChange={handleChange}
+            className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
+            placeholder="New Applicants: Why do you want to be a UTA?"
+          ></textarea>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className={`btn w-full rounded-none font-sans font-medium normal-case ${
+              details.first === "" &&
+              details.last === "" &&
+              details.email === ""
+                ? "btn-disabled cursor-no-drop"
+                : "btn"
+            }`}
+          >
+            {details.first === "" && details.last === "" && details.email === ""
+              ? "Start typing..."
+              : "Submit"}
+          </button>
+        </div>
+        {success && (
+          <p className="text-md p-2 text-center font-medium sm:text-lg">{`Sent.`}</p>
+        )}
+      </form>
+      {/* Form Container */}
+    </div>
   );
 };

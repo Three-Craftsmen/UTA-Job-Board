@@ -2,16 +2,17 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["jsonProtocol"]
 }
+
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
-// DO NOT MODIFY, Necessary for Next AUTH
+/// DO NOT MODIFY, Necessary for Next AUTH
 model Account {
     id                String  @id @default(cuid())
     userId            String
@@ -28,16 +29,21 @@ model Account {
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
-// DO NOT MODIFY, Necessary for Next AUTH
+
+/// DO NOT MODIFY, Necessary for Next AUTH
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
-// DO NOT MODIFY, Necessary for Next AUTH
+
+/// DO NOT MODIFY, Necessary for Next AUTH
 model VerificationToken {
     identifier String
     token      String   @unique
@@ -45,19 +51,101 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
-// ONLY ADD TO THIS, Current contents necessary for Next AUTH
+
+/// User contains attributes that apply to all users and that are necissary for Next Auth
 model User {
     id            String    @id @default(cuid())
     name          String?
+    // firstName     String?
+    // lastName      String?
+    gnumber       String?   @unique
     email         String?   @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
+    profiles      Profile[]
+    role          Role      @default(STUDENT)
 }
-// TODO: Add more below this line
+
+/// Role determines the access level of the user
+enum Role {
+    STUDENT
+    ADMIN
+}
+
+/// Provided example model from t3 (used in example router)
 model Example {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+/// Each Profile represents an UTA application for a semester
+model Profile {
+    id                   String          @id @default(cuid())
+    semester             String
+    phoneNumber          String
+    major                String
+    graduationDate       String
+    overallGPA           Float
+    prevSemGPA           Float
+    creditsLastSem       Int
+    utaBefore            Boolean
+    prevUTAType          String?
+    prevUTACourses       String?
+    recommender          String?
+    preferredProfs       String?
+    essay                String?
+    user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId               String
+    preferredCourses     Course[]
+    pickedCourses        PickedCourse[]
+    preferredDuties      Duty[]
+    minHours             Int
+    maxHours             Int
+    idealHours           Int
+    oncampusAvailability OncampusBlock[]
+    onlineAvailability   OnlineBlock[]
+
+    @@index([userId])
+}
+
+/// This inbetween model allows for a m-n relationship with a grade attribute for each pair
+model PickedCourse {
+    grade     String
+    Profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId String
+    Course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    courseId  String
+
+    @@id([profileId, courseId])
+    @@index([profileId])
+    @@index([courseId])
+}
+
+/// Each Course represents a course that can have UTAs
+model Course {
+    id          String         @id @default(cuid())
+    name        String         @unique
+    pickedBy    PickedCourse[]
+    preferredBy Profile[]
+}
+
+/// A Duty represents a possible choice for preferred duties
+model Duty {
+    name     String    @id
+    pickedBy Profile[]
+}
+
+/// Each OncampusBlock represents a half hour time segment of on-campus availability
+model OncampusBlock {
+    time          String    @id
+    availableUTAs Profile[]
+}
+
+/// Each OnlineBlock represents a half day time segment of online availability
+model OnlineBlock {
+    time          String    @id
+    availableUTAs Profile[]
 }

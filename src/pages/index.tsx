@@ -2,19 +2,14 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from "~/utils/api";
+import { type ChangeEvent, useState } from "react";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "src/components/ui/Tabs";
+import { useMultiStepForm } from "~/hooks/useMultiStepForm";
+import { api } from "~/utils/api";
 
 import LoginIcon from "@mui/icons-material/Login";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LaunchIcon from "@mui/icons-material/Launch";
-import { ChangeEvent, useState } from "react";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -55,7 +50,6 @@ const Home: NextPage = () => {
         />
         <meta property="twitter:image" content="images/preview.png"></meta>
       </Head>
-      {/* Document Head: Contains Metadata */}
       {/* Main: Main Content rendered in the HTML Body*/}
       <main>
         {/* User Logged In: Display Main App Content */}
@@ -64,7 +58,6 @@ const Home: NextPage = () => {
         {/* User Not Logged In: Display Login Page */}
         {sessionData === null && <LoginPage />}
       </main>
-      {/* Main: Main Content rendered in the HTML Body*/}
     </>
   );
 };
@@ -125,8 +118,7 @@ const MainContent = () => {
       <Header />
       <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
         <div className="flex max-w-4xl flex-col items-center gap-12">
-          <h1 className="text-2xl font-bold sm:text-5xl">UTA Job Board</h1>
-          <FormTabs />
+          <MultiStepForm />
         </div>
       </section>
     </>
@@ -218,31 +210,40 @@ const LoginPage = () => {
   );
 };
 
-const FormTabs = () => {
+const MultiStepForm = () => {
+  const { steps, step, currentStepIndex, firstStep, lastStep, back, next } =
+    useMultiStepForm([
+      <GeneralForm key={1} />,
+      <GradesForm key={2} />,
+      <TimesForm key={3} />,
+    ]);
+
   return (
     <section className="grid place-content-center place-items-center">
-      <Tabs defaultValue="general" className="w-full max-w-2xl p-4">
-        <TabsList className="flex flex-row gap-12">
-          <TabsTrigger value="general" className="tab tab-lg">
-            General
-          </TabsTrigger>
-          <TabsTrigger value="grades" className="tab tab-lg">
-            Grades
-          </TabsTrigger>
-          <TabsTrigger value="times" className="tab tab-lg">
-            Times
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="general">
-          <GeneralForm />
-        </TabsContent>
-        <TabsContent value="grades">
-          <GradesForm />
-        </TabsContent>
-        <TabsContent value="times">
-          <TimesForm />
-        </TabsContent>
-      </Tabs>
+      <div className="relative">
+        <span className="absolute right-2 top-2">
+          {currentStepIndex + 1} / {steps.length}
+        </span>
+        {step}
+        <div className="grid grid-flow-col justify-items-stretch p-4">
+          {!firstStep && (
+            <button
+              className="btn-outline btn-sm btn justify-self-start"
+              onClick={back}
+            >
+              Back
+            </button>
+          )}
+          {!lastStep && (
+            <button
+              className="btn-outline btn-sm btn justify-self-end"
+              onClick={next}
+            >
+              Next
+            </button>
+          )}
+        </div>
+      </div>
     </section>
   );
 };
@@ -270,32 +271,97 @@ const GeneralForm = () => {
     <div className="grid place-content-center pt-12">
       <h1 className="pb-12 text-center text-4xl font-bold md:text-5xl">{`General Info:`}</h1>
       {/* Form Container */}
-      <form className="flex max-w-2xl flex-col gap-2 p-2">
+      <form className="flex w-[100vw] max-w-3xl flex-col gap-2 p-2">
         <div className="flex flex-row gap-1">
           <input
-            name="first"
+            name="firstName"
             type="text"
             placeholder="First Name"
             onChange={handleChange}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
-            name="last"
+            name="lastName"
             type="text"
             placeholder="Last Name"
             onChange={handleChange}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
-        <div>
+        <div className="flex flex-row gap-1">
           <input
-            name="email"
+            name="gnumber"
+            type="text"
+            placeholder="G-Number"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="masonEmail"
             type="email"
-            placeholder="Email"
+            placeholder="Mason Email"
             onChange={handleChange}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
+        <span className="divider"></span>
+        <div className="flex flex-row gap-1">
+          <input
+            name="major"
+            type="text"
+            placeholder="Major"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="graduationDate"
+            type="text"
+            placeholder="Expected Graduation Date"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <div className="flex flex-row gap-1">
+          <input
+            name="overallGPA"
+            type="float"
+            placeholder="Overall GPA"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="prevSemGPA"
+            type="float"
+            placeholder="Previous Semester GPA"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="creditsLastSem"
+            type="float"
+            placeholder="# Credits Last Semester"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <span className="divider"></span>
+        <div className="flex flex-row gap-1">
+          <input
+            name="newUTA"
+            type="text"
+            placeholder="First Time UTA?"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+          <input
+            name="prevUTACourses"
+            type="text"
+            placeholder="If not, what courses have you been a UTA for?"
+            onChange={handleChange}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
+        </div>
+        <span className="divider"></span>
         <div>
           <textarea
             name="message"

@@ -93,13 +93,13 @@ model Application {
     creditsLastSem       Int
     newUTA               Boolean
     prevUTAType          String?
-    prevUTACourses       String? // May need to change to a relation to courses
+    prevUTACourses       Course[]        @relation("Course_prevUTACourses")
     recommender          String?
     preferredProfs       String?
     essay                String?
     user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId               String
-    preferredCourses     Course[]
+    preferredCourses     Course[]        @relation("Course_preferredCourses")
     pickedCourses        PickedCourse[]
     preferredDuties      Duty[]
     minHours             Int
@@ -126,10 +126,11 @@ model PickedCourse {
 
 /// Each Course represents a course that can have UTAs
 model Course {
-    id          String         @id @default(cuid())
-    name        String         @unique
-    pickedBy    PickedCourse[]
-    preferredBy Application[]
+    id           String         @id @default(cuid())
+    name         String         @unique
+    pickedBy     PickedCourse[]
+    preferredBy  Application[]  @relation("Course_preferredCourses")
+    previousUTAs Application[]  @relation("Course_prevUTACourses")
 }
 
 /// A Duty represents a possible choice for preferred duties

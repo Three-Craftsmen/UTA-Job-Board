@@ -2,7 +2,10 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userDataRouter = createTRPCRouter({
-  userDataPut: protectedProcedure
+  /**
+   * updateUserData endpoint:
+   */
+  updateUserData: protectedProcedure
     .input(
       z.object({
         firstName: z.string(),
@@ -12,7 +15,7 @@ export const userDataRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.user.update({
+      const user = await ctx.prisma.user.update({
         where: {
           id: input.gnumber,
         },
@@ -23,9 +26,13 @@ export const userDataRouter = createTRPCRouter({
           email: input.email,
         },
       });
+      return user;
     }),
 
-  applicationDataPut: protectedProcedure
+  /**
+   * updateApplicationData endpoint:
+   */
+  updateApplicationData: protectedProcedure
     .input(
       z.object({
         phoneNumber: z.string(),
@@ -42,9 +49,10 @@ export const userDataRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.application.update({
+      const userId = ctx.session.user.id;
+      const application = await ctx.prisma.application.update({
         where: {
-          id: input.phoneNumber,
+          id: userId,
         },
         data: {
           phoneNumber: input.phoneNumber,
@@ -60,5 +68,7 @@ export const userDataRouter = createTRPCRouter({
           essay: input.essay,
         },
       });
+
+      return application;
     }),
 });

@@ -125,31 +125,6 @@ const MainContent = () => {
   );
 };
 
-/* TODO: Delete Later, this is not needed anymore, nor is the example tRPC router. */
-const AuthShowcase: React.FC = () => {
-  const { data: sessionData } = useSession();
-
-  const { data: secretMessage } = api.example.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: sessionData?.user !== undefined }
-  );
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <p className="text-center text-2xl text-white">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-        {secretMessage && <span> - {secretMessage}</span>}
-      </p>
-      <button
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-        onClick={sessionData ? () => void signOut() : () => void signIn()}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
-    </div>
-  );
-};
-
 /**
  * EFFECTS: Displays a full-height login page that has the capability to redirect the user to sign in.
  * @returns TSX Template
@@ -230,12 +205,14 @@ const MultiStepForm = () => {
             <button
               className="btn-outline btn-sm btn justify-self-start"
               onClick={back}
+              type="button"
             >
               Back
             </button>
           )}
           {!lastStep && (
             <button
+              type="button"
               className="btn-outline btn-sm btn justify-self-end"
               onClick={next}
             >
@@ -256,10 +233,13 @@ const GeneralForm = () => {
     last: "",
     email: "",
     message: "",
+    newUTA: "",
   });
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = event.target;
     setDetails((prev) => {
@@ -297,13 +277,20 @@ const GeneralForm = () => {
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
-            name="masonEmail"
-            type="email"
-            placeholder="Mason Email"
+            name="phoneNumber"
+            type="text"
+            placeholder="Phone Number"
             onChange={handleChange}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
+        <input
+          name="masonEmail"
+          type="email"
+          placeholder="Mason Email"
+          onChange={handleChange}
+          className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+        />
         <span className="divider"></span>
         <div className="flex flex-row gap-1">
           <input
@@ -345,30 +332,70 @@ const GeneralForm = () => {
           />
         </div>
         <span className="divider"></span>
-        <div className="flex flex-row gap-1">
-          <input
+        <div className="flex w-full flex-col gap-1">
+          <label className="label">
+            <span className="label-text">Have you been a UTA before?</span>
+          </label>
+          <select
             name="newUTA"
-            type="text"
-            placeholder="First Time UTA?"
             onChange={handleChange}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            name="prevUTACourses"
-            type="text"
-            placeholder="If not, what courses have you been a UTA for?"
-            onChange={handleChange}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
+            className="select-bordered select-primary select w-full rounded-none font-medium placeholder-base-content"
+          >
+            <option className="selected disabled">{`Please select an answer.`}</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
         </div>
-        <span className="divider"></span>
-        <div>
-          <textarea
-            name="message"
+        {/* This will be displayed if they have been a UTA before */}
+        {details.newUTA == "Yes" && (
+          <div className="flex w-full flex-col gap-2">
+            <span className="divider" />
+            <div className="flex flex-row gap-1">
+              <input
+                name="prevUTAType"
+                type="text"
+                placeholder="What type of UTA were you?"
+                onChange={handleChange}
+                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+              />
+              <input
+                name="prevUTACourses"
+                type="text"
+                placeholder="What courses have you been a UTA for?"
+                onChange={handleChange}
+                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+              />
+            </div>
+          </div>
+        )}
+        {/* This will be displayed if the user has not */}
+        {details.newUTA == "No" && (
+          <div className="flex flex-col gap-2">
+            <span className="divider"></span>
+            <input
+              name="recomender"
+              type="text"
+              placeholder="Which professor is recommending you?"
+              onChange={handleChange}
+              className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+            />
+            <textarea
+              name="message"
+              onChange={handleChange}
+              className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
+              placeholder="Why do you want to be a UTA?"
+            ></textarea>
+          </div>
+        )}
+        <div className="flex w-full flex-col gap-2">
+          <span className="divider"></span>
+          <input
+            name="preferedProfs"
+            type="text"
+            placeholder="Please list your preferred professors."
             onChange={handleChange}
-            className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
-            placeholder="New Applicants: Why do you want to be a UTA?"
-          ></textarea>
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+          />
         </div>
         <div>
           <button
@@ -386,9 +413,6 @@ const GeneralForm = () => {
               : "Submit"}
           </button>
         </div>
-        {success && (
-          <p className="text-md p-2 text-center font-medium sm:text-lg">{`Sent.`}</p>
-        )}
       </form>
       {/* Form Container */}
     </div>

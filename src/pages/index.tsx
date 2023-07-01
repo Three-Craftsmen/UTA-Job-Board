@@ -2,7 +2,6 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { type ChangeEvent, useState } from "react";
 
 import { useMultiStepForm } from "~/hooks/useMultiStepForm";
 import { api } from "~/utils/api";
@@ -10,6 +9,7 @@ import { api } from "~/utils/api";
 import LoginIcon from "@mui/icons-material/Login";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LaunchIcon from "@mui/icons-material/Launch";
+import { type FormEvent, useState } from "react";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -64,10 +64,6 @@ const Home: NextPage = () => {
 
 export default Home;
 
-/**
- * EFFECTS: Displays a fixed nav element to the top of the screen.
- * @returns TSX Template
- */
 const Header = () => {
   const { data: sessionData } = useSession();
 
@@ -107,11 +103,6 @@ const Header = () => {
   );
 };
 
-/**
- * EFFECTS: Displays a full-height page.
- *          This is where the main app content is displayed and able to be interacted with.
- * @returns TSX Template
- */
 const MainContent = () => {
   return (
     <>
@@ -125,76 +116,73 @@ const MainContent = () => {
   );
 };
 
-/**
- * EFFECTS: Displays a full-height login page that has the capability to redirect the user to sign in.
- * @returns TSX Template
- */
-const LoginPage = () => {
-  return (
-    <>
-      {/* Login Header */}
-      <header className="navbar bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl sm:p-4">
-        <div className="flex-1">
-          <a className="btn-disabled btn-ghost btn-md btn text-lg normal-case sm:text-xl">
-            Application Portal
-          </a>
-        </div>
-        <div className="flex-end">
-          <a
-            className="btn-ghost btn text-lg normal-case text-secondary sm:text-xl"
-            href="#"
-          >
-            Docs <LaunchIcon style={{ width: "24px", height: "24px" }} />
-          </a>
-        </div>
-      </header>
-      {/* Login Header */}
-      <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
-        <div className="flex flex-col items-center gap-12 p-4">
-          {/* Overview Text */}
-          <div className="flex max-w-4xl flex-col">
-            <h1 className="text-center text-2xl font-bold sm:text-3xl md:text-4xl lg:text-4xl">
-              {`Undergraduate Teaching Assistantships`}
-            </h1>
-            <p className="max-w-3xl pt-6 indent-6 text-sm sm:text-lg">{`Undergraduate Teaching Assistants are current undergraduate students who assist in courses they've successfully completed at Mason. It is an enriching way to hone your skills, help others survive and thrive, and get paid a bit along the way. Our UTAs are a large part of our students' success in early courses. We welcome current undergraduate students to apply after completing CS courses here at Mason!`}</p>
-            <br />
-            <b className="text-center text-sm sm:text-lg">{`Now Accepting Summer and Fall 2023 Applications!`}</b>
-          </div>
-          {/* Overview Text */}
-          {/* Login Card */}
-          <div className="card h-60 w-full max-w-sm bg-base-200 bg-opacity-20 backdrop-blur-3xl">
-            <div className="card-body items-center gap-8">
-              <h2 className="text-2xl font-bold sm:text-3xl md:text-3xl">
-                Login with GitHub
-              </h2>
-              <h3 className="text-3xl text-secondary">
-                <GitHubIcon style={{ width: "34px", height: "34px" }} />
-              </h3>
-              <button
-                className="btn-outline btn max-w-md"
-                onClick={() => void signIn()}
-              >
-                Login <LoginIcon />
-              </button>
-            </div>
-          </div>
-          {/* Login Card */}
-        </div>
-      </section>
-    </>
-  );
+type FormData = {
+  firstName: string;
+  lastName: string;
+  gnumber: string;
+  phoneNumber: string;
+  masonEmail: string;
+  major: string;
+  graduationDate: string;
+  overallGPA: string;
+  prevSemGPA: string;
+  creditsLastSem: string;
+  newUTA: string;
+  prevUTAType: string;
+  prevUTACourses: string;
+  recommender: string;
+  essay: string;
+  preferredProfs: string;
+};
+
+/* Initial Form State ~ For data persistence */
+const INITIALSTATE: FormData = {
+  firstName: "",
+  lastName: "",
+  gnumber: "",
+  phoneNumber: "",
+  masonEmail: "",
+  major: "",
+  graduationDate: "",
+  overallGPA: "",
+  prevSemGPA: "",
+  creditsLastSem: "",
+  newUTA: "",
+  prevUTAType: "",
+  prevUTACourses: "",
+  recommender: "",
+  essay: "",
+  preferredProfs: "",
 };
 
 const MultiStepForm = () => {
+  const [data, setData] = useState(INITIALSTATE);
+  const updateFields = (fields: Partial<FormData>) => {
+    setData((prev) => {
+      return { ...prev, ...fields };
+    });
+  };
+
   const { steps, step, currentStepIndex, firstStep, lastStep, back, next } =
     useMultiStepForm([
-      <GeneralForm key={1} />,
-      <GradesForm key={2} />,
-      <TimesForm key={3} />,
+      <GeneralForm key={1} {...data} updateFields={updateFields} />,
+      <GradesForm key={2} {...data} updateFields={updateFields} />,
+      <TimesForm key={3} {...data} updateFields={updateFields} />,
     ]);
 
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!lastStep) {
+      return next();
+    }
+    alert("Success");
+  };
+
   return (
-    <section className="grid place-content-center place-items-center">
+    <form
+      className="grid place-content-center place-items-center"
+      onSubmit={onSubmit}
+    >
       <div className="relative">
         <span className="absolute right-2 top-2">
           {currentStepIndex + 1} / {steps.length}
@@ -210,124 +198,161 @@ const MultiStepForm = () => {
               Back
             </button>
           )}
-          {!lastStep && (
-            <button
-              type="button"
-              className="btn-outline btn-sm btn justify-self-end"
-              onClick={next}
-            >
-              Next
-            </button>
-          )}
+          <button
+            type="submit"
+            className="btn-outline btn-sm btn justify-self-end"
+          >
+            {lastStep ? `Submit` : `Next`}
+          </button>
         </div>
       </div>
-    </section>
+    </form>
   );
 };
 
-const GeneralForm = () => {
-  const [success, setSuccess] = useState(false);
+type GeneralFormData = {
+  firstName: string;
+  lastName: string;
+  gnumber: string;
+  phoneNumber: string;
+  masonEmail: string;
+  major: string;
+  graduationDate: string;
+  overallGPA: string;
+  prevSemGPA: string;
+  creditsLastSem: string;
+  newUTA: string;
+  prevUTAType: string;
+  prevUTACourses: string;
+  recommender: string;
+  essay: string;
+  preferredProfs: string;
+};
 
-  const [details, setDetails] = useState({
-    first: "",
-    last: "",
-    email: "",
-    message: "",
-    newUTA: "",
-  });
+type GeneralFormProps = GeneralFormData & {
+  updateFields: (fields: Partial<GeneralFormData>) => void;
+};
 
-  const handleChange = (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = event.target;
-    setDetails((prev) => {
-      return { ...prev, [name]: value };
-    });
-  };
-
+const GeneralForm = ({
+  firstName,
+  lastName,
+  gnumber,
+  phoneNumber,
+  masonEmail,
+  major,
+  graduationDate,
+  overallGPA,
+  prevSemGPA,
+  creditsLastSem,
+  newUTA,
+  prevUTAType,
+  prevUTACourses,
+  recommender,
+  essay,
+  preferredProfs,
+  updateFields,
+}: GeneralFormProps) => {
   return (
     <div className="grid place-content-center pt-12">
-      <h1 className="pb-12 text-center text-4xl font-bold md:text-5xl">{`General Info:`}</h1>
-      {/* Form Container */}
-      <form className="flex w-[100vw] max-w-3xl flex-col gap-2 p-2">
+      <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`General Info:`}</h1>
+      <div className="flex w-[100vw] max-w-3xl flex-col gap-2 p-2">
         <div className="flex flex-row gap-1">
           <input
+            autoFocus
+            required
             name="firstName"
             type="text"
             placeholder="First Name"
-            onChange={handleChange}
+            value={firstName}
+            onChange={(e) => updateFields({ firstName: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
+            required
             name="lastName"
             type="text"
             placeholder="Last Name"
-            onChange={handleChange}
+            value={lastName}
+            onChange={(e) => updateFields({ lastName: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
         <div className="flex flex-row gap-1">
           <input
+            required
             name="gnumber"
             type="text"
             placeholder="G-Number"
-            onChange={handleChange}
+            value={gnumber}
+            onChange={(e) => updateFields({ gnumber: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
+            required
             name="phoneNumber"
             type="text"
             placeholder="Phone Number"
-            onChange={handleChange}
+            value={phoneNumber}
+            onChange={(e) => updateFields({ phoneNumber: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
         <input
+          required
           name="masonEmail"
           type="email"
           placeholder="Mason Email"
-          onChange={handleChange}
+          value={masonEmail}
+          onChange={(e) => updateFields({ masonEmail: e.target.value })}
           className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
         />
         <span className="divider"></span>
         <div className="flex flex-row gap-1">
           <input
+            required
             name="major"
             type="text"
             placeholder="Major"
-            onChange={handleChange}
+            value={major}
+            onChange={(e) => updateFields({ major: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
+            required
             name="graduationDate"
             type="text"
             placeholder="Expected Graduation Date"
-            onChange={handleChange}
+            value={graduationDate}
+            onChange={(e) => updateFields({ graduationDate: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
         <div className="flex flex-row gap-1">
           <input
+            required
             name="overallGPA"
             type="float"
             placeholder="Overall GPA"
-            onChange={handleChange}
+            value={overallGPA}
+            onChange={(e) => updateFields({ overallGPA: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
+            required
             name="prevSemGPA"
             type="float"
             placeholder="Previous Semester GPA"
-            onChange={handleChange}
+            value={prevSemGPA}
+            onChange={(e) => updateFields({ prevSemGPA: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
           <input
+            required
             name="creditsLastSem"
             type="float"
             placeholder="# Credits Last Semester"
-            onChange={handleChange}
+            value={creditsLastSem}
+            onChange={(e) => updateFields({ creditsLastSem: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
@@ -337,8 +362,10 @@ const GeneralForm = () => {
             <span className="label-text">Have you been a UTA before?</span>
           </label>
           <select
+            required
             name="newUTA"
-            onChange={handleChange}
+            value={newUTA}
+            onChange={(e) => updateFields({ newUTA: e.target.value })}
             className="select-bordered select-primary select w-full rounded-none font-medium placeholder-base-content"
           >
             <option className="selected disabled">{`Please select an answer.`}</option>
@@ -347,7 +374,7 @@ const GeneralForm = () => {
           </select>
         </div>
         {/* This will be displayed if they have been a UTA before */}
-        {details.newUTA == "Yes" && (
+        {newUTA == "Yes" && (
           <div className="flex w-full flex-col gap-2">
             <span className="divider" />
             <div className="flex flex-row gap-1">
@@ -355,33 +382,39 @@ const GeneralForm = () => {
                 name="prevUTAType"
                 type="text"
                 placeholder="What type of UTA were you?"
-                onChange={handleChange}
+                value={prevUTAType}
+                onChange={(e) => updateFields({ prevUTAType: e.target.value })}
                 className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
               />
               <input
                 name="prevUTACourses"
                 type="text"
                 placeholder="What courses have you been a UTA for?"
-                onChange={handleChange}
+                value={prevUTACourses}
+                onChange={(e) =>
+                  updateFields({ prevUTACourses: e.target.value })
+                }
                 className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
               />
             </div>
           </div>
         )}
         {/* This will be displayed if the user has not */}
-        {details.newUTA == "No" && (
+        {newUTA == "No" && (
           <div className="flex flex-col gap-2">
             <span className="divider"></span>
             <input
-              name="recomender"
+              name="recommender"
               type="text"
               placeholder="Which professor is recommending you?"
-              onChange={handleChange}
+              value={recommender}
+              onChange={(e) => updateFields({ recommender: e.target.value })}
               className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
             />
             <textarea
-              name="message"
-              onChange={handleChange}
+              name="essay"
+              value={essay}
+              onChange={(e) => updateFields({ essay: e.target.value })}
               className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
               placeholder="Why do you want to be a UTA?"
             ></textarea>
@@ -390,31 +423,16 @@ const GeneralForm = () => {
         <div className="flex w-full flex-col gap-2">
           <span className="divider"></span>
           <input
-            name="preferedProfs"
+            required
+            name="preferredProfs"
             type="text"
             placeholder="Please list your preferred professors."
-            onChange={handleChange}
+            value={preferredProfs}
+            onChange={(e) => updateFields({ preferredProfs: e.target.value })}
             className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
           />
         </div>
-        <div>
-          <button
-            type="submit"
-            className={`btn w-full rounded-none font-sans font-medium normal-case ${
-              details.first === "" &&
-              details.last === "" &&
-              details.email === ""
-                ? "btn-disabled cursor-no-drop"
-                : "btn"
-            }`}
-          >
-            {details.first === "" && details.last === "" && details.email === ""
-              ? "Start typing..."
-              : "Submit"}
-          </button>
-        </div>
-      </form>
-      {/* Form Container */}
+      </div>
     </div>
   );
 };
@@ -580,5 +598,61 @@ const TimesForm = () => {
       </form>
       {/* Form Container */}
     </div>
+  );
+};
+
+const LoginPage = () => {
+  return (
+    <>
+      {/* Login Header */}
+      <header className="navbar bg-base-200 bg-opacity-20 p-2 backdrop-blur-3xl sm:p-4">
+        <div className="flex-1">
+          <a className="btn-disabled btn-ghost btn-md btn text-lg normal-case sm:text-xl">
+            Application Portal
+          </a>
+        </div>
+        <div className="flex-end">
+          <a
+            className="btn-ghost btn text-lg normal-case text-secondary sm:text-xl"
+            href="#"
+          >
+            Docs <LaunchIcon style={{ width: "24px", height: "24px" }} />
+          </a>
+        </div>
+      </header>
+      {/* Login Header */}
+      <section className="grid min-h-[80vh] w-full place-items-center bg-base-100">
+        <div className="flex flex-col items-center gap-12 p-4">
+          {/* Overview Text */}
+          <div className="flex max-w-4xl flex-col">
+            <h1 className="text-center text-2xl font-bold sm:text-3xl md:text-4xl lg:text-4xl">
+              {`Undergraduate Teaching Assistantships`}
+            </h1>
+            <p className="max-w-3xl pt-6 indent-6 text-sm sm:text-lg">{`Undergraduate Teaching Assistants are current undergraduate students who assist in courses they've successfully completed at Mason. It is an enriching way to hone your skills, help others survive and thrive, and get paid a bit along the way. Our UTAs are a large part of our students' success in early courses. We welcome current undergraduate students to apply after completing CS courses here at Mason!`}</p>
+            <br />
+            <b className="text-center text-sm sm:text-lg">{`Now Accepting Summer and Fall 2023 Applications!`}</b>
+          </div>
+          {/* Overview Text */}
+          {/* Login Card */}
+          <div className="card h-60 w-full max-w-sm bg-base-200 bg-opacity-20 backdrop-blur-3xl">
+            <div className="card-body items-center gap-8">
+              <h2 className="text-2xl font-bold sm:text-3xl md:text-3xl">
+                Login with GitHub
+              </h2>
+              <h3 className="text-3xl text-secondary">
+                <GitHubIcon style={{ width: "34px", height: "34px" }} />
+              </h3>
+              <button
+                className="btn-outline btn max-w-md"
+                onClick={() => void signIn()}
+              >
+                Login <LoginIcon />
+              </button>
+            </div>
+          </div>
+          {/* Login Card */}
+        </div>
+      </section>
+    </>
   );
 };

@@ -3,6 +3,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { type FormEvent, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { api } from "~/utils/api";
 
 import { useMultiStepForm } from "~/hooks/useMultiStepForm";
 import { GeneralForm } from "~/components/forms/GeneralForm";
@@ -116,6 +117,7 @@ const MainContent = () => {
 };
 
 type FormData = {
+  /* General Form Data */
   firstName: string;
   lastName: string;
   gnumber: string;
@@ -132,9 +134,13 @@ type FormData = {
   recommender: string;
   essay: string;
   preferredProfs: string;
+  /* Grades Form Data */
+
+  /* Times Form Data */
 };
 
 const INITIALSTATE: FormData = {
+  /* General Form Data */
   firstName: "",
   lastName: "",
   gnumber: "",
@@ -151,6 +157,9 @@ const INITIALSTATE: FormData = {
   recommender: "",
   essay: "",
   preferredProfs: "",
+  /* Grades Form Data */
+
+  /* Times Form Data */
 };
 
 const MultiStepForm = () => {
@@ -160,6 +169,11 @@ const MultiStepForm = () => {
       return { ...prev, ...fields };
     });
   };
+
+  /* Router function defenitions: */
+  const updateGeneralUser = api.general.updateUserData.useMutation();
+  const updateGeneralApplication =
+    api.general.updateApplicationData.useMutation();
 
   const { steps, step, currentStepIndex, firstStep, lastStep, back, next } =
     useMultiStepForm([
@@ -173,8 +187,29 @@ const MultiStepForm = () => {
     if (!lastStep) {
       return next();
     }
-    /* TODO: Send data to tRPC */
     alert("Successful Submit");
+    /* WIP: Send General data to tRPC */
+    updateGeneralUser.mutate({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      gnumber: data.gnumber,
+      email: data.masonEmail,
+    });
+    updateGeneralApplication.mutate({
+      phoneNumber: data.phoneNumber,
+      major: data.major,
+      graduationDate: data.graduationDate,
+      overallGPA: data.overallGPA,
+      prevSemGPA: data.prevSemGPA,
+      newUTA: data.newUTA,
+      prevUTAType: data.prevUTAType,
+      recommender: data.recommender,
+      essay: data.essay,
+      preferredProfs: data.preferredProfs,
+    });
+    /* TODO: Send Grades data to tRPC */
+
+    /* TODO: Send Times data to tRPC */
   };
 
   return (

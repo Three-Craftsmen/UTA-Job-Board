@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
-export const userDataRouter = createTRPCRouter({
+export const generalInfoRouter = createTRPCRouter({
   /**
    * updateUserData endpoint:
    */

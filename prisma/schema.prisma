@@ -116,7 +116,7 @@ model PickedCourse {
     grade         String
     Application   Application @relation(fields: [ApplicationId], references: [id], onDelete: Cascade)
     ApplicationId String
-    Course        Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    Course        Course      @relation(fields: [courseId], references: [name], onDelete: Cascade)
     courseId      String
 
     @@id([ApplicationId, courseId])
@@ -126,8 +126,7 @@ model PickedCourse {
 
 /// Each Course represents a course that can have UTAs
 model Course {
-    id           String         @id @default(cuid())
-    name         String         @unique
+    name         String         @id
     pickedBy     PickedCourse[]
     preferredBy  Application[]  @relation("Course_preferredCourses")
     previousUTAs Application[]  @relation("Course_prevUTACourses")

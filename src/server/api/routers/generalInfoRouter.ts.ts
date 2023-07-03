@@ -15,9 +15,10 @@ export const generalInfoRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
       const user = await ctx.prisma.user.update({
         where: {
-          id: input.gnumber,
+          id: userId,
         },
         data: {
           firstName: input.firstName,
@@ -71,4 +72,6 @@ export const generalInfoRouter = createTRPCRouter({
 
       return application;
     }),
+
+  /* TODO: getGeneralInfo: protectedProcedure */
 });

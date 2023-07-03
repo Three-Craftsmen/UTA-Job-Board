@@ -170,7 +170,27 @@ const MultiStepForm = () => {
     });
   };
 
-  /* Router function defenitions: */
+  const typeConversions = (
+    newUTA: string,
+    overallGPA: string,
+    prevSemGPA: string,
+    creditsLastSem: string
+  ) => {
+    let newUTAcopy = false;
+    let overallGPAcopy = 0.0;
+    let prevSemGPAcopy = 0.0;
+    let creditsLastSemcopy = 0;
+    if (newUTA === "Yes") {
+      newUTAcopy = true;
+    }
+    overallGPAcopy = parseFloat(overallGPA);
+    prevSemGPAcopy = parseFloat(prevSemGPA);
+    creditsLastSemcopy = parseInt(creditsLastSem);
+
+    return { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy };
+  };
+
+  /* Router function definitions: */
   const updateGeneralUser = api.general.updateUserData.useMutation();
   const updateGeneralApplication =
     api.general.updateApplicationData.useMutation();
@@ -188,21 +208,32 @@ const MultiStepForm = () => {
       return next();
     }
     alert("Successful Submit");
-    /* WIP: Send General data to tRPC */
+
+    const { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy } =
+      typeConversions(
+        data.newUTA,
+        data.overallGPA,
+        data.prevSemGPA,
+        data.creditsLastSem
+      );
+    /* Before we make updates, create an empty appication */
+
     updateGeneralUser.mutate({
       firstName: data.firstName,
       lastName: data.lastName,
       gnumber: data.gnumber,
       email: data.masonEmail,
     });
+
     updateGeneralApplication.mutate({
       phoneNumber: data.phoneNumber,
       major: data.major,
       graduationDate: data.graduationDate,
-      overallGPA: data.overallGPA,
-      prevSemGPA: data.prevSemGPA,
-      newUTA: data.newUTA,
+      overallGPA: overallGPAcopy,
+      prevSemGPA: prevSemGPAcopy,
+      newUTA: newUTAcopy,
       prevUTAType: data.prevUTAType,
+      creditsLastSem: creditsLastSemcopy,
       recommender: data.recommender,
       essay: data.essay,
       preferredProfs: data.preferredProfs,
@@ -232,12 +263,23 @@ const MultiStepForm = () => {
               Back
             </button>
           )}
-          <button
-            type="submit"
-            className="btn-outline btn-sm btn justify-self-end"
-          >
-            {lastStep ? `Submit` : `Next`}
-          </button>
+          {!lastStep && (
+            <button
+              className="btn-outline btn-sm btn justify-self-end"
+              onClick={next}
+              type="button"
+            >
+              Next
+            </button>
+          )}
+          {lastStep && (
+            <button
+              type="submit"
+              className="btn-outline btn-sm btn justify-self-end"
+            >
+              {`Submit`}
+            </button>
+          )}
         </div>
       </div>
     </form>

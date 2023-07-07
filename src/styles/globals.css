@@ -4,4 +4,5 @@
 
 html {
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  scroll-behavior: smooth;
 }

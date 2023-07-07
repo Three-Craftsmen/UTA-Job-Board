@@ -1,223 +1,554 @@
+import { type Course } from "~/types/types";
+
 type GradesFormData = {
-  firstName: string;
-  lastName: string;
-  gnumber: string;
-  phoneNumber: string;
-  masonEmail: string;
-  major: string;
-  graduationDate: string;
-  overallGPA: string;
-  prevSemGPA: string;
-  creditsLastSem: string;
-  newUTA: string;
-  prevUTAType: string;
-  prevUTACourses: string;
-  recommender: string;
-  essay: string;
-  preferredProfs: string;
+  courses: Course[];
+  preferredCourses: string;
 };
 
 type GradesFormProps = GradesFormData & {
   updateFields: (fields: Partial<GradesFormData>) => void;
+} & {
+  updateCourses: (
+    field: string,
+    name: string | undefined,
+    target: string
+  ) => void;
 };
 
 export const GradesForm = ({
-  firstName,
-  lastName,
-  gnumber,
-  phoneNumber,
-  masonEmail,
-  major,
-  graduationDate,
-  overallGPA,
-  prevSemGPA,
-  creditsLastSem,
-  newUTA,
-  prevUTAType,
-  prevUTACourses,
-  recommender,
-  essay,
-  preferredProfs,
   updateFields,
+  updateCourses,
+  courses,
+  preferredCourses,
 }: GradesFormProps) => {
+  const csCourses = courses.filter((course) => course.name?.includes("CS"));
+  const cs100level: Course[] = [];
+  csCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "1") {
+      cs100level[i] = course;
+    }
+  });
+  const cs200level: Course[] = [];
+  csCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "2") {
+      cs200level[i] = course;
+    }
+  });
+  const cs300level: Course[] = [];
+  csCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "3") {
+      cs300level[i] = course;
+    }
+  });
+  const cs400level: Course[] = [];
+  csCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "4") {
+      cs400level[i] = course;
+    }
+  });
+  const sweCourses: Course[] = courses.filter((course) =>
+    course.name?.includes("SWE")
+  );
+  const swe200level: Course[] = [];
+  sweCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "2") {
+      swe200level[i] = course;
+    }
+  });
+  const swe400level: Course[] = [];
+  sweCourses.forEach((course, i) => {
+    if (course.name?.split(" ")[1]?.charAt(0) == "4") {
+      swe400level[i] = course;
+    }
+  });
+
+  const pickedCourses: Course[] = [];
+  courses.forEach((course) => {
+    if (course.interested == "Yes") {
+      pickedCourses.push(course);
+    }
+  });
+
   return (
     <div className="grid place-content-center pt-12">
-      <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`Grades Info:`}</h1>
-      <div className="flex w-[100vw] max-w-3xl flex-col gap-2 p-2">
-        <div className="flex flex-row gap-1">
-          <input
-            autoFocus
-            required
-            name="firstName"
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => updateFields({ firstName: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="lastName"
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => updateFields({ lastName: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="gnumber"
-            type="text"
-            placeholder="G-Number"
-            value={gnumber}
-            onChange={(e) => updateFields({ gnumber: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="phoneNumber"
-            type="text"
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => updateFields({ phoneNumber: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <input
-          required
-          name="masonEmail"
-          type="email"
-          placeholder="Mason Email"
-          value={masonEmail}
-          onChange={(e) => updateFields({ masonEmail: e.target.value })}
-          className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-        />
+      <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`Apply For Courses:`}</h1>
+      <p className="max-w-2xl text-center text-lg italic">{`If you're interested in a course, click the checkbox and select the grade you recieved. You can apply to as many courses as you want. You may only be selected for one.`}</p>
+      <div className="flex w-[100vw] max-w-3xl flex-col p-2">
         <span className="divider"></span>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="major"
-            type="text"
-            placeholder="Major"
-            value={major}
-            onChange={(e) => updateFields({ major: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="graduationDate"
-            type="text"
-            placeholder="Expected Graduation Date"
-            value={graduationDate}
-            onChange={(e) => updateFields({ graduationDate: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="overallGPA"
-            type="float"
-            placeholder="Overall GPA"
-            value={overallGPA}
-            onChange={(e) => updateFields({ overallGPA: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="prevSemGPA"
-            type="float"
-            placeholder="Previous Semester GPA"
-            value={prevSemGPA}
-            onChange={(e) => updateFields({ prevSemGPA: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="creditsLastSem"
-            type="float"
-            placeholder="# Credits Last Semester"
-            value={creditsLastSem}
-            onChange={(e) => updateFields({ creditsLastSem: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <span className="divider"></span>
-        <div className="flex w-full flex-col gap-1">
-          <label className="label">
-            <span className="label-text">Have you been a UTA before?</span>
-          </label>
-          <select
-            required
-            name="newUTA"
-            value={newUTA}
-            onChange={(e) => updateFields({ newUTA: e.target.value })}
-            className="select-bordered select-primary select w-full rounded-none font-medium placeholder-base-content"
-          >
-            <option className="selected disabled">{`Please select an answer.`}</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-        {/* This will be displayed if they have been a UTA before */}
-        {newUTA == "Yes" && (
-          <div className="flex w-full flex-col gap-2">
-            <span className="divider" />
-            <div className="flex flex-row gap-1">
-              <input
-                name="prevUTAType"
-                type="text"
-                placeholder="What type of UTA were you?"
-                value={prevUTAType}
-                onChange={(e) => updateFields({ prevUTAType: e.target.value })}
-                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-              />
-              <input
-                name="prevUTACourses"
-                type="text"
-                placeholder="What courses have you been a UTA for?"
-                value={prevUTACourses}
-                onChange={(e) =>
-                  updateFields({ prevUTACourses: e.target.value })
-                }
-                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-              />
+        {/* CS 100 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            100 Level CS Courses
+          </div>
+          {/* 100 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {cs100level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        )}
-        {/* This will be displayed if the user has not */}
-        {newUTA == "No" && (
-          <div className="flex flex-col gap-2">
-            <span className="divider"></span>
-            <input
-              name="recommender"
-              type="text"
-              placeholder="Which professor is recommending you?"
-              value={recommender}
-              onChange={(e) => updateFields({ recommender: e.target.value })}
-              className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-            />
-            <textarea
-              name="essay"
-              value={essay}
-              onChange={(e) => updateFields({ essay: e.target.value })}
-              className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
-              placeholder="Why do you want to be a UTA?"
-            ></textarea>
+        </div>
+
+        <span className="divider"></span>
+        {/* CS 200 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            200 Level CS Courses
           </div>
-        )}
-        <div className="flex w-full flex-col gap-2">
-          <span className="divider"></span>
+          {/* 200 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {cs200level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        {/* CS 300 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            300 Level CS Courses
+          </div>
+          {/* 300 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {cs300level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        {/* CS 400 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            400 Level CS Courses
+          </div>
+          {/* 400 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {cs400level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        {/* SWE 200 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            200 Level SWE Courses
+          </div>
+          {/* 200 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {swe200level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        {/* SWE 400 Level */}
+        <div className="collapse-open collapse bg-base-100">
+          <input type="radio" name="" />
+          <div className="collapse-title text-2xl font-bold">
+            400 Level SWE Courses
+          </div>
+          {/* 400 Level Selections */}
+          <div className="collapse-content">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {swe400level.map((course) => (
+                <div
+                  key={course.name}
+                  className="flex w-80 bg-base-200 bg-opacity-20 p-4 shadow-2xl"
+                >
+                  <div className="flex w-full flex-col">
+                    <div className="flex flex-col gap-1">
+                      {/* Intersest Checkbox */}
+                      <div className="form-control">
+                        <label className="label cursor-pointer">
+                          <span className="label-text w-full text-xl">
+                            {course.name}
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={course.interested?.includes("Yes")}
+                            onChange={(e) => {
+                              if (e.target.checked == true) {
+                                updateCourses("interested", course.name, "Yes");
+                              } else if (e.target.checked == false) {
+                                updateCourses("interested", course.name, "No");
+                              }
+                            }}
+                            className="checkbox-secondary checkbox"
+                          />
+                        </label>
+                      </div>
+                      {/* Grade Select */}
+                      <div className="flex flex-col gap-0">
+                        <label className="label">
+                          <span className="label-text w-full text-sm">
+                            Grade Recieved:
+                          </span>
+                        </label>
+                        <select
+                          required
+                          name=""
+                          value={course.grade}
+                          onChange={(e) =>
+                            updateCourses("grade", course.name, e.target.value)
+                          }
+                          className="disabled select-ghost select select-sm w-full rounded-none font-medium placeholder-base-content"
+                        >
+                          <option className="selected disabled">{`Select`}</option>
+                          <option value="A+">A+</option>
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                        </select>
+                        <div />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        <div>
+          <h1 className="p-4 text-xl">Courses you selected:</h1>
+          <div className="flex flex-wrap gap-4 px-4">
+            {pickedCourses.map((course) => (
+              <div
+                key={course.name}
+                className="flex flex-row gap-4 bg-base-200 bg-opacity-20 p-2 shadow-2xl"
+              >
+                <h2>{course.name}:</h2>
+                <h3>{course.grade}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <span className="divider"></span>
+
+        <div className="w-full">
+          <label className="label">
+            <span className="label-text text-lg">
+              List your top 3 preferred courses.
+            </span>
+          </label>
           <input
             required
-            name="preferredProfs"
+            name="preferredCourses"
             type="text"
-            placeholder="Please list your preferred professors."
-            value={preferredProfs}
-            onChange={(e) => updateFields({ preferredProfs: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+            placeholder="CS112 CS262 CS367"
+            value={preferredCourses}
+            onChange={(e) => updateFields({ preferredCourses: e.target.value })}
+            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
           />
         </div>
       </div>

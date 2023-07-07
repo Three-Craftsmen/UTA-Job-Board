@@ -11,6 +11,8 @@ import { Login } from "~/components/Login";
 import { GradesForm } from "~/components/forms/GradesForm";
 import { TimesForm } from "~/components/forms/TimesForm";
 
+import { type Course } from "~/types/types";
+
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
 
@@ -86,7 +88,7 @@ const Header = () => {
           </label>
           <ul
             tabIndex={0}
-            className="dropdown-content menu rounded-box menu-sm mt-3 w-32 bg-base-100 p-2 shadow"
+            className="dropdown-content menu rounded-box menu-sm z-50 mt-3 w-32 bg-base-100 p-2 shadow"
           >
             <li>
               <a className="justify-between sm:text-lg">Profile</a>
@@ -135,7 +137,8 @@ type FormData = {
   essay: string;
   preferredProfs: string;
   /* Grades Form Data */
-
+  courses: Course[];
+  preferredCourses: string;
   /* Times Form Data */
 };
 
@@ -158,47 +161,108 @@ const INITIALSTATE: FormData = {
   essay: "",
   preferredProfs: "",
   /* Grades Form Data */
-
+  courses: [],
+  preferredCourses: "",
   /* Times Form Data */
 };
 
 const MultiStepForm = () => {
   const [data, setData] = useState(INITIALSTATE);
+
+  const getCurrentCourses = api.grades.getAllCourses.useQuery();
+
+  const currentCoursesForClient = () => {
+    const coursesFromDatabase = getCurrentCourses.data;
+    const courses: Course[] = [];
+    coursesFromDatabase?.forEach((course, i) => {
+      const newCourse: Course = {
+        name: course.name,
+        interested: "",
+        grade: "",
+      };
+      courses[i] = newCourse;
+    });
+    return courses;
+  };
+  if (data.courses.length == 0) {
+    data.courses = currentCoursesForClient();
+  }
+
   const updateFields = (fields: Partial<FormData>) => {
     setData((prev) => {
       return { ...prev, ...fields };
     });
   };
 
-  const typeConversions = (
-    newUTA: string,
-    overallGPA: string,
-    prevSemGPA: string,
-    creditsLastSem: string
+  const updateCourses = (
+    field: string,
+    name: string | undefined,
+    target: string
   ) => {
-    let newUTAcopy = false;
-    let overallGPAcopy = 0.0;
-    let prevSemGPAcopy = 0.0;
-    let creditsLastSemcopy = 0;
-    if (newUTA === "Yes") {
-      newUTAcopy = true;
+    let index = 0;
+    for (let i = 0; i < data.courses.length; i++) {
+      if (data?.courses[i]?.name === name) {
+        index = i;
+      }
     }
-    overallGPAcopy = parseFloat(overallGPA);
-    prevSemGPAcopy = parseFloat(prevSemGPA);
-    creditsLastSemcopy = parseInt(creditsLastSem);
-
-    return { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy };
+    if (field == "interested" && data.courses[index] !== undefined) {
+      const course: Course = {
+        name: data.courses[index]?.name,
+        interested: target,
+        grade: data.courses[index]?.grade,
+      };
+      data.courses[index] = course;
+      setData((prev) => {
+        return { ...prev, ...data.courses };
+      });
+    } else if (field == "grade" && data.courses[index] !== undefined) {
+      const course: Course = {
+        name: data.courses[index]?.name,
+        interested: data.courses[index]?.interested,
+        grade: target,
+      };
+      data.courses[index] = course;
+      setData((prev) => {
+        return { ...prev, ...data.courses };
+      });
+    }
   };
 
+  // const typeConversions = (
+  //   newUTA: string,
+  //   overallGPA: string,
+  //   prevSemGPA: string,
+  //   creditsLastSem: string
+  // ) => {
+  //   let newUTAcopy = false;
+  //   let overallGPAcopy = 0.0;
+  //   let prevSemGPAcopy = 0.0;
+  //   let creditsLastSemcopy = 0;
+  //   if (newUTA === "Yes") {
+  //     newUTAcopy = true;
+  //   }
+  //   overallGPAcopy = parseFloat(overallGPA);
+  //   prevSemGPAcopy = parseFloat(prevSemGPA);
+  //   creditsLastSemcopy = parseInt(creditsLastSem);
+
+  //   return { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy };
+  // };
+
   /* Router function definitions: */
-  const updateGeneralUser = api.general.updateUserData.useMutation();
-  const updateGeneralApplication =
-    api.general.updateApplicationData.useMutation();
+  // const updateGeneralUser = api.general.updateUserData.useMutation();
+  // TODO: Sub this out for createApplication
+  // const updateGeneralApplication =
+  //   api.general.updateApplicationData.useMutation();
 
   const { steps, step, currentStepIndex, firstStep, lastStep, back, next } =
     useMultiStepForm([
       <GeneralForm key={1} {...data} updateFields={updateFields} />,
-      <GradesForm key={2} {...data} updateFields={updateFields} />,
+      <GradesForm
+        key={2}
+        {...data}
+        updateFields={updateFields}
+        updateCourses={updateCourses}
+      />,
       <TimesForm key={3} {...data} updateFields={updateFields} />,
     ]);
 
@@ -209,35 +273,34 @@ const MultiStepForm = () => {
     }
     alert("Successful Submit");
 
-    const { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy } =
-      typeConversions(
-        data.newUTA,
-        data.overallGPA,
-        data.prevSemGPA,
-        data.creditsLastSem
-      );
-    /* Before we make updates, create an empty appication */
+    // const { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy } =
+    //   typeConversions(
+    //     data.newUTA,
+    //     data.overallGPA,
+    //     data.prevSemGPA,
+    //     data.creditsLastSem
+    //   );
+    // /* Before we make updates, create an empty appication */
 
-    updateGeneralUser.mutate({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      gnumber: data.gnumber,
-      email: data.masonEmail,
-    });
+    // updateGeneralUser.mutate({
+    //   firstName: data.firstName,
+    //   lastName: data.lastName,
+    //   gnumber: data.gnumber,
+    //   email: data.masonEmail,
+    // });
+    // The rest of General Info:
+    //   phoneNumber: data.phoneNumber,
+    //   major: data.major,
+    //   graduationDate: data.graduationDate,
+    //   overallGPA: overallGPAcopy,
+    //   prevSemGPA: prevSemGPAcopy,
+    //   newUTA: newUTAcopy,
+    //   prevUTAType: data.prevUTAType,
+    //   creditsLastSem: creditsLastSemcopy,
+    //   recommender: data.recommender,
+    //   essay: data.essay,
+    //   preferredProfs: data.preferredProfs,
 
-    updateGeneralApplication.mutate({
-      phoneNumber: data.phoneNumber,
-      major: data.major,
-      graduationDate: data.graduationDate,
-      overallGPA: overallGPAcopy,
-      prevSemGPA: prevSemGPAcopy,
-      newUTA: newUTAcopy,
-      prevUTAType: data.prevUTAType,
-      creditsLastSem: creditsLastSemcopy,
-      recommender: data.recommender,
-      essay: data.essay,
-      preferredProfs: data.preferredProfs,
-    });
     /* TODO: Send Grades data to tRPC */
 
     /* TODO: Send Times data to tRPC */
@@ -255,27 +318,30 @@ const MultiStepForm = () => {
         {step}
         <div className="grid grid-flow-col justify-items-stretch p-4">
           {!firstStep && (
-            <button
-              className="btn-outline btn-sm btn justify-self-start"
+            <a
+              className="btn-primary btn-sm btn justify-self-start rounded-none"
+              href="#"
               onClick={back}
               type="button"
             >
               Back
-            </button>
+            </a>
           )}
           {!lastStep && (
-            <button
-              className="btn-outline btn-sm btn justify-self-end"
-              onClick={next}
+            <a
+              className="btn-primary btn-sm btn justify-self-end rounded-none"
+              href="#"
               type="button"
+              // TODO: Remove the following line and change type to submit again.
+              onClick={next}
             >
               Next
-            </button>
+            </a>
           )}
           {lastStep && (
             <button
               type="submit"
-              className="btn-outline btn-sm btn justify-self-end"
+              className="btn-primary btn-sm btn justify-self-end rounded-none"
             >
               {`Submit`}
             </button>

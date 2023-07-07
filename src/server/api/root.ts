@@ -1,11 +1,11 @@
 import { createTRPCRouter } from "~/server/api/trpc";
-import { generalInfoRouter } from "./routers/generalInfoRouter.ts";
-import { applicationRouter } from "./routers/applicationRouter.js";
-import { gradesInfoRouter } from "./routers/gradesInfoRouter.js";
-import { timesInfoRouter } from "./routers/timesInfoRouter.js";
+import { generalInfoRouter } from "./routers/generalInfoRouter";
+import { applicationRouter } from "./routers/applicationRouter";
+import { gradesInfoRouter } from "./routers/gradesInfoRouter";
+import { timesInfoRouter } from "./routers/timesInfoRouter";
 
 /**
- * This is the primary router for your server.
+ * This is the primary router for the server.
  *
  * All routers added in /api/routers should be manually added here.
  */

@@ -1,20 +1,16 @@
+import {
+  type Duty,
+  type OncampusBlock,
+  type OnlineBlock,
+} from "@prisma/client";
+
 type TimesFormData = {
-  firstName: string;
-  lastName: string;
-  gnumber: string;
-  phoneNumber: string;
-  masonEmail: string;
-  major: string;
-  graduationDate: string;
-  overallGPA: string;
-  prevSemGPA: string;
-  creditsLastSem: string;
-  newUTA: string;
-  prevUTAType: string;
-  prevUTACourses: string;
-  recommender: string;
-  essay: string;
-  preferredProfs: string;
+  preferredDuties: Duty[];
+  minHours: string;
+  maxHours: string;
+  idealHours: string;
+  oncampusAvailability: OncampusBlock[];
+  onlineAvailibility: OnlineBlock[];
 };
 
 type TimesFormProps = TimesFormData & {
@@ -22,203 +18,256 @@ type TimesFormProps = TimesFormData & {
 };
 
 export const TimesForm = ({
-  firstName,
-  lastName,
-  gnumber,
-  phoneNumber,
-  masonEmail,
-  major,
-  graduationDate,
-  overallGPA,
-  prevSemGPA,
-  creditsLastSem,
-  newUTA,
-  prevUTAType,
-  prevUTACourses,
-  recommender,
-  essay,
-  preferredProfs,
+  preferredDuties,
+  minHours,
+  maxHours,
+  idealHours,
+  oncampusAvailability,
+  onlineAvailibility,
   updateFields,
 }: TimesFormProps) => {
   return (
     <div className="grid place-content-center pt-12">
-      <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`Times Info:`}</h1>
-      <div className="flex w-[100vw] max-w-3xl flex-col gap-2 p-2">
-        <div className="flex flex-row gap-1">
-          <input
-            autoFocus
-            required
-            name="firstName"
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => updateFields({ firstName: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="lastName"
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => updateFields({ lastName: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="gnumber"
-            type="text"
-            placeholder="G-Number"
-            value={gnumber}
-            onChange={(e) => updateFields({ gnumber: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="phoneNumber"
-            type="text"
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => updateFields({ phoneNumber: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <input
-          required
-          name="masonEmail"
-          type="email"
-          placeholder="Mason Email"
-          value={masonEmail}
-          onChange={(e) => updateFields({ masonEmail: e.target.value })}
-          className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-        />
-        <span className="divider"></span>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="major"
-            type="text"
-            placeholder="Major"
-            value={major}
-            onChange={(e) => updateFields({ major: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="graduationDate"
-            type="text"
-            placeholder="Expected Graduation Date"
-            value={graduationDate}
-            onChange={(e) => updateFields({ graduationDate: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <div className="flex flex-row gap-1">
-          <input
-            required
-            name="overallGPA"
-            type="float"
-            placeholder="Overall GPA"
-            value={overallGPA}
-            onChange={(e) => updateFields({ overallGPA: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="prevSemGPA"
-            type="float"
-            placeholder="Previous Semester GPA"
-            value={prevSemGPA}
-            onChange={(e) => updateFields({ prevSemGPA: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-          <input
-            required
-            name="creditsLastSem"
-            type="float"
-            placeholder="# Credits Last Semester"
-            value={creditsLastSem}
-            onChange={(e) => updateFields({ creditsLastSem: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
-        </div>
-        <span className="divider"></span>
-        <div className="flex w-full flex-col gap-1">
-          <label className="label">
-            <span className="label-text">Have you been a UTA before?</span>
-          </label>
-          <select
-            required
-            name="newUTA"
-            value={newUTA}
-            onChange={(e) => updateFields({ newUTA: e.target.value })}
-            className="select-bordered select-primary select w-full rounded-none font-medium placeholder-base-content"
-          >
-            <option className="selected disabled">{`Please select an answer.`}</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-        {/* This will be displayed if they have been a UTA before */}
-        {newUTA == "Yes" && (
-          <div className="flex w-full flex-col gap-2">
-            <span className="divider" />
-            <div className="flex flex-row gap-1">
+      <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`Duties and Times:`}</h1>
+      <div className="grid w-[100vw] max-w-3xl place-items-center gap-8 p-2">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-20">
+          {/* Preffered Duties */}
+          <div className="grid w-full max-w-sm place-items-center bg-base-200 bg-opacity-20 p-2 shadow-2xl">
+            <h1 className="p-1 text-3xl font-semibold">Preffered Duties</h1>
+            <p className="text-center text-sm italic">
+              Place a ✓ next to tasks you want to do.
+            </p>
+            {/* Map over Duties Here */}
+            {/* Each one should look like: */}
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Lab Assistance</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Piazza Time Blocks</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Review Sessions</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Office Hours</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Coding Assignments</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Running Tests</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="w-full p-2">
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text text-lg">Other</span>
+                  <input
+                    type="checkbox"
+                    className="checkbox-secondary checkbox"
+                  />
+                </label>
+              </div>
+            </div>
+            {false && (
+              <div className="w-full">
+                <label className="label">
+                  <span className="label-text">Please Specify</span>
+                </label>
+                <input
+                  required
+                  name="preferredProfs"
+                  type="text"
+                  placeholder="In class UTA"
+                  value=""
+                  className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
+                />
+              </div>
+            )}
+          </div>
+          {/* Hours */}
+          <div className="grid w-full max-w-sm place-items-center bg-base-200 bg-opacity-20 p-2 shadow-2xl">
+            <h1 className="p-1 text-3xl font-semibold">Hours</h1>
+            <p className="text-center text-sm italic">
+              Enter your desired number of hours in each box.
+            </p>
+            <div className="w-full">
+              <label className="label">
+                <span className="label-text text-xl">Minimum Hours</span>
+              </label>
               <input
-                name="prevUTAType"
+                required
+                inputMode="decimal"
+                name="minHours"
                 type="text"
-                placeholder="What type of UTA were you?"
-                value={prevUTAType}
-                onChange={(e) => updateFields({ prevUTAType: e.target.value })}
-                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+                placeholder="e.g. 5"
+                value={minHours}
+                onChange={(e) => updateFields({ minHours: e.target.value })}
+                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
               />
+            </div>
+            <div className="w-full">
+              <label className="label">
+                <span className="label-text text-xl">Ideal Hours</span>
+              </label>
               <input
-                name="prevUTACourses"
+                required
+                inputMode="decimal"
+                name="idealHours"
                 type="text"
-                placeholder="What courses have you been a UTA for?"
-                value={prevUTACourses}
-                onChange={(e) =>
-                  updateFields({ prevUTACourses: e.target.value })
-                }
-                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
+                placeholder="e.g. 15"
+                value={idealHours}
+                onChange={(e) => updateFields({ idealHours: e.target.value })}
+                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
+              />
+            </div>
+            <div className="w-full">
+              <label className="label">
+                <span className="label-text text-xl">Maximum Hours</span>
+              </label>
+              <input
+                required
+                inputMode="decimal"
+                name="maxHours"
+                type="text"
+                placeholder="e.g. 30"
+                value={maxHours}
+                onChange={(e) => updateFields({ maxHours: e.target.value })}
+                className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
               />
             </div>
           </div>
-        )}
-        {/* This will be displayed if the user has not */}
-        {newUTA == "No" && (
-          <div className="flex flex-col gap-2">
-            <span className="divider"></span>
-            <input
-              name="recommender"
-              type="text"
-              placeholder="Which professor is recommending you?"
-              value={recommender}
-              onChange={(e) => updateFields({ recommender: e.target.value })}
-              className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-            />
-            <textarea
-              name="essay"
-              value={essay}
-              onChange={(e) => updateFields({ essay: e.target.value })}
-              className="input-bordered input-primary input textarea w-full rounded-none font-medium placeholder-base-content"
-              placeholder="Why do you want to be a UTA?"
-            ></textarea>
+        </div>
+        <div className="grid w-full max-w-2xl place-items-center bg-base-200 bg-opacity-20 p-2 shadow-2xl">
+          <h1 className="text-3xl font-semibold">On-Campus Availibility</h1>
+          <p className="p-4 text-sm italic">
+            Fill in the boxes that you <span className="text-warning">can</span>{" "}
+            assist on campus.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="table">
+              {/* head */}
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Monday</th>
+                  <th>Tuesday</th>
+                  <th>Wednesday</th>
+                  <th>Thursday</th>
+                  <th>Friday</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* row 1 */}
+                <tr>
+                  <th>8:00 am</th>
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-lg w-12"
+                    />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                </tr>
+                {/* row 2 */}
+                <tr>
+                  <th>8:30 am</th>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                </tr>
+                {/* row 3 */}
+                <tr>
+                  <th>9:00 am</th>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                  <td>
+                    <input type="checkbox" className="checkbox checkbox-lg" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        )}
-        <div className="flex w-full flex-col gap-2">
-          <span className="divider"></span>
-          <input
-            required
-            name="preferredProfs"
-            type="text"
-            placeholder="Please list your preferred professors."
-            value={preferredProfs}
-            onChange={(e) => updateFields({ preferredProfs: e.target.value })}
-            className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content"
-          />
         </div>
       </div>
     </div>

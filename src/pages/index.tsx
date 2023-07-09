@@ -5,13 +5,14 @@ import { type FormEvent, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 
+import { Login } from "~/components/Login";
 import { useMultiStepForm } from "~/hooks/useMultiStepForm";
 import { GeneralForm } from "~/components/forms/GeneralForm";
-import { Login } from "~/components/Login";
 import { GradesForm } from "~/components/forms/GradesForm";
 import { TimesForm } from "~/components/forms/TimesForm";
 
 import { type Course } from "~/types/types";
+import type { OncampusBlock, OnlineBlock, Duty } from "@prisma/client";
 
 const Home: NextPage = () => {
   const { data: sessionData } = useSession();
@@ -137,9 +138,17 @@ type FormData = {
   essay: string;
   preferredProfs: string;
   /* Grades Form Data */
+  /* courses: Course[] does not need sent to backend. */
   courses: Course[];
+  pickedCourses: Course[];
   preferredCourses: string;
   /* Times Form Data */
+  preferredDuties: Duty[];
+  minHours: string;
+  maxHours: string;
+  idealHours: string;
+  oncampusAvailability: OncampusBlock[];
+  onlineAvailibility: OnlineBlock[];
 };
 
 const INITIALSTATE: FormData = {
@@ -162,14 +171,22 @@ const INITIALSTATE: FormData = {
   preferredProfs: "",
   /* Grades Form Data */
   courses: [],
+  pickedCourses: [],
   preferredCourses: "",
   /* Times Form Data */
+  preferredDuties: [],
+  minHours: "",
+  maxHours: "",
+  idealHours: "",
+  oncampusAvailability: [],
+  onlineAvailibility: [],
 };
 
 const MultiStepForm = () => {
   const [data, setData] = useState(INITIALSTATE);
 
   const getCurrentCourses = api.grades.getAllCourses.useQuery();
+  console.log(getCurrentCourses);
 
   const currentCoursesForClient = () => {
     const coursesFromDatabase = getCurrentCourses.data;
@@ -182,9 +199,10 @@ const MultiStepForm = () => {
       };
       courses[i] = newCourse;
     });
+
     return courses;
   };
-  if (data.courses.length == 0) {
+  if (data.courses.length === 0) {
     data.courses = currentCoursesForClient();
   }
 
@@ -228,6 +246,7 @@ const MultiStepForm = () => {
     }
   };
 
+  // Converts Client Types to Database Types:
   // const typeConversions = (
   //   newUTA: string,
   //   overallGPA: string,
@@ -248,11 +267,10 @@ const MultiStepForm = () => {
   //   return { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy };
   // };
 
-  /* Router function definitions: */
+  /* Router hook definitions: */
   // const updateGeneralUser = api.general.updateUserData.useMutation();
-  // TODO: Sub this out for createApplication
-  // const updateGeneralApplication =
-  //   api.general.updateApplicationData.useMutation();
+  // TODO: Sub the below out for createApplication
+  // const updateGeneralApplication = api.general.updateApplicationData.useMutation();
 
   const { steps, step, currentStepIndex, firstStep, lastStep, back, next } =
     useMultiStepForm([
@@ -273,6 +291,7 @@ const MultiStepForm = () => {
     }
     alert("Successful Submit");
 
+    // Filter types for database:
     // const { newUTAcopy, overallGPAcopy, prevSemGPAcopy, creditsLastSemcopy } =
     //   typeConversions(
     //     data.newUTA,
@@ -280,15 +299,17 @@ const MultiStepForm = () => {
     //     data.prevSemGPA,
     //     data.creditsLastSem
     //   );
-    // /* Before we make updates, create an empty appication */
 
+    // Update User:
     // updateGeneralUser.mutate({
     //   firstName: data.firstName,
     //   lastName: data.lastName,
     //   gnumber: data.gnumber,
     //   email: data.masonEmail,
     // });
-    // The rest of General Info:
+
+    // CREATE APPLICATION:
+    // General Info:
     //   phoneNumber: data.phoneNumber,
     //   major: data.major,
     //   graduationDate: data.graduationDate,
@@ -300,10 +321,8 @@ const MultiStepForm = () => {
     //   recommender: data.recommender,
     //   essay: data.essay,
     //   preferredProfs: data.preferredProfs,
-
-    /* TODO: Send Grades data to tRPC */
-
-    /* TODO: Send Times data to tRPC */
+    /* TODO: Grades Info: */
+    /* TODO: Times Info: */
   };
 
   return (

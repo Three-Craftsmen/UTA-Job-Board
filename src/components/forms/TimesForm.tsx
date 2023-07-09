@@ -5,6 +5,9 @@ import {
 } from "@prisma/client";
 
 type TimesFormData = {
+  duties: Duty[];
+  onCampusBlocks: OncampusBlock[];
+  onlineBlocks: OnlineBlock[];
   preferredDuties: Duty[];
   minHours: string;
   maxHours: string;
@@ -18,6 +21,9 @@ type TimesFormProps = TimesFormData & {
 };
 
 export const TimesForm = ({
+  duties,
+  onCampusBlocks,
+  onlineBlocks,
   preferredDuties,
   minHours,
   maxHours,
@@ -37,85 +43,20 @@ export const TimesForm = ({
             <p className="text-center text-sm italic">
               Place a ✓ next to tasks you want to do.
             </p>
-            {/* Map over Duties Here */}
-            {/* Each one should look like: */}
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Lab Assistance</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
+            {/* Map over Duties */}
+            {duties.map((duty) => (
+              <div key={duty.name} className="w-[90%] p-2">
+                <div className="form-control w-full">
+                  <label className="label cursor-pointer">
+                    <span className="label-text text-lg">{duty.name}</span>
+                    <input
+                      type="checkbox"
+                      className="checkbox-secondary checkbox"
+                    />
+                  </label>
+                </div>
               </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Piazza Time Blocks</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Review Sessions</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Office Hours</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Coding Assignments</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Running Tests</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="w-full p-2">
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text text-lg">Other</span>
-                  <input
-                    type="checkbox"
-                    className="checkbox-secondary checkbox"
-                  />
-                </label>
-              </div>
-            </div>
+            ))}
             {false && (
               <div className="w-full">
                 <label className="label">
@@ -123,9 +64,9 @@ export const TimesForm = ({
                 </label>
                 <input
                   required
-                  name="preferredProfs"
+                  name="other"
                   type="text"
-                  placeholder="In class UTA"
+                  placeholder="In class assistance"
                   value=""
                   className="input-bordered input-primary input w-full rounded-none font-medium placeholder-base-content placeholder:italic"
                 />
@@ -192,79 +133,115 @@ export const TimesForm = ({
             assist on campus.
           </p>
           <div className="overflow-x-auto">
-            <table className="table">
+            <table className="table-lg table">
               {/* head */}
               <thead>
                 <tr>
                   <th></th>
-                  <th>Monday</th>
-                  <th>Tuesday</th>
-                  <th>Wednesday</th>
-                  <th>Thursday</th>
-                  <th>Friday</th>
+                  <th className="font-semibold text-base-content">Mon.</th>
+                  <th className="font-semibold text-base-content">Tues.</th>
+                  <th className="font-semibold text-base-content">Wed.</th>
+                  <th className="font-semibold text-base-content">Thur.</th>
+                  <th className="font-semibold text-base-content">Fri.</th>
                 </tr>
               </thead>
               <tbody>
-                {/* row 1 */}
+                {/* Loop over times */}
+                {onCampusBlocks.map((time) => (
+                  <tr key={time.time}>
+                    <th>{time.time}</th>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="grid w-full max-w-2xl place-items-center bg-base-200 bg-opacity-20 p-2 shadow-2xl">
+          <h1 className="text-3xl font-semibold">Online Availibility</h1>
+          <p className="p-4 text-sm italic">
+            Fill in the boxes that you <span className="text-warning">can</span>{" "}
+            assist online.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="table-lg table">
+              {/* head */}
+              <thead>
                 <tr>
-                  <th>8:00 am</th>
-                  <td>
-                    <input
-                      type="checkbox"
-                      className="checkbox checkbox-lg w-12"
-                    />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
+                  <th></th>
+                  <th className="font-semibold text-base-content">Mon.</th>
+                  <th className="font-semibold text-base-content">Tues.</th>
+                  <th className="font-semibold text-base-content">Wed.</th>
+                  <th className="font-semibold text-base-content">Thur.</th>
+                  <th className="font-semibold text-base-content">Fri.</th>
                 </tr>
-                {/* row 2 */}
-                <tr>
-                  <th>8:30 am</th>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                </tr>
-                {/* row 3 */}
-                <tr>
-                  <th>9:00 am</th>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                  <td>
-                    <input type="checkbox" className="checkbox checkbox-lg" />
-                  </td>
-                </tr>
+              </thead>
+              <tbody>
+                {/* Loop over times */}
+                {onlineBlocks.map((time) => (
+                  <tr key={time.time}>
+                    <th>{time.time}</th>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-lg w-14 rounded-none"
+                      />{" "}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

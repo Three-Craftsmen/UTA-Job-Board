@@ -143,6 +143,12 @@ type FormData = {
   pickedCourses: Course[];
   preferredCourses: string;
   /* Times Form Data */
+  /* duties: Duty[] does not need sent to backend. */
+  duties: Duty[];
+  /* onCampusBlocks: OncampusBlock[] does not need sent to backend. */
+  onCampusBlocks: OnlineBlock[];
+  /* onnlineBlocks: OncampusBlock[] does not need sent to backend. */
+  onlineBlocks: OnlineBlock[];
   preferredDuties: Duty[];
   minHours: string;
   maxHours: string;
@@ -174,6 +180,9 @@ const INITIALSTATE: FormData = {
   pickedCourses: [],
   preferredCourses: "",
   /* Times Form Data */
+  duties: [],
+  onCampusBlocks: [],
+  onlineBlocks: [],
   preferredDuties: [],
   minHours: "",
   maxHours: "",
@@ -185,8 +194,11 @@ const INITIALSTATE: FormData = {
 const MultiStepForm = () => {
   const [data, setData] = useState(INITIALSTATE);
 
+  /* Hooks for calling initial state population endpoints */
   const getCurrentCourses = api.grades.getAllCourses.useQuery();
-  console.log(getCurrentCourses);
+  const getCurrentDuties = api.times.getAllDuties.useQuery();
+  const getCurrentOnCampusBlocks = api.times.getAllOnCampusBlocks.useQuery();
+  const getCurrentOnlineBlocks = api.times.getAllOnlineBlocks.useQuery();
 
   const currentCoursesForClient = () => {
     const coursesFromDatabase = getCurrentCourses.data;
@@ -202,8 +214,21 @@ const MultiStepForm = () => {
 
     return courses;
   };
+  /* Set courses in form state to the courses from DB */
   if (data.courses.length === 0) {
     data.courses = currentCoursesForClient();
+  }
+  /* Set duties in form state to the duties from DB */
+  if (data.duties.length === 0) {
+    data.duties = getCurrentDuties.data || [];
+  }
+  /* Set onCampusBlocks in form state to the onCampusBlocks from DB */
+  if (data.onCampusBlocks.length === 0) {
+    data.onCampusBlocks = getCurrentOnCampusBlocks.data || [];
+  }
+  /* Set onlineBlocks in form state to the onCampusBlocks from DB */
+  if (data.onlineBlocks.length === 0) {
+    data.onlineBlocks = getCurrentOnlineBlocks.data || [];
   }
 
   const updateFields = (fields: Partial<FormData>) => {

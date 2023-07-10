@@ -18,6 +18,10 @@ type TimesFormData = {
 
 type TimesFormProps = TimesFormData & {
   updateFields: (fields: Partial<TimesFormData>) => void;
+} & {
+  updatePreferredDuties: (duty: Duty) => void;
+} & {
+  updateAvailibility: (time: OncampusBlock | OnlineBlock, type: string) => void;
 };
 
 export const TimesForm = ({
@@ -31,7 +35,24 @@ export const TimesForm = ({
   oncampusAvailability,
   onlineAvailibility,
   updateFields,
+  updatePreferredDuties,
+  updateAvailibility,
 }: TimesFormProps) => {
+  const checkPrefferedDuties = (duty: Duty) => {
+    let flag = false;
+    preferredDuties.forEach((prefferedDuty) => {
+      if (duty.name === prefferedDuty.name) {
+        flag = true;
+        return true;
+      }
+      return true;
+    });
+    if (flag === true) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div className="grid place-content-center pt-12">
       <h1 className="pb-12 text-center text-4xl font-bold text-secondary md:text-5xl">{`Duties and Times:`}</h1>
@@ -51,6 +72,8 @@ export const TimesForm = ({
                     <span className="label-text text-lg">{duty.name}</span>
                     <input
                       type="checkbox"
+                      checked={checkPrefferedDuties(duty)}
+                      onChange={() => updatePreferredDuties(duty)}
                       className="checkbox-secondary checkbox"
                     />
                   </label>
@@ -126,6 +149,7 @@ export const TimesForm = ({
             </div>
           </div>
         </div>
+        {/* On Campus Availibility */}
         <div className="grid w-full max-w-2xl place-items-center bg-base-200 bg-opacity-20 p-2 shadow-2xl">
           <h1 className="text-3xl font-semibold">On-Campus Availibility</h1>
           <p className="p-4 text-sm italic">

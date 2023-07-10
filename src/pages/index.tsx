@@ -271,6 +271,33 @@ const MultiStepForm = () => {
     }
   };
 
+  const updatePreferredDuties = (duty: Duty) => {
+    data.preferredDuties.forEach((prefferedDuty, i) => {
+      if (duty.name === prefferedDuty.name) {
+        data.preferredDuties.splice(i, 1);
+        setData((prev) => {
+          console.log(data.preferredDuties);
+          return { ...prev, ...data.preferredDuties.splice(i, 1) };
+        });
+      }
+    });
+    data.preferredDuties.push(duty);
+    setData((prev) => {
+      return { ...prev, ...data.preferredDuties };
+    });
+  };
+
+  const updateAvailibility = (
+    time: OncampusBlock | OnlineBlock,
+    type: string
+  ) => {
+    if (type === "OnCampus") {
+      data.oncampusAvailability.push(time);
+    } else if (type === "Online") {
+      data.onlineAvailibility.push(time);
+    }
+  };
+
   // Converts Client Types to Database Types:
   // const typeConversions = (
   //   newUTA: string,
@@ -306,7 +333,13 @@ const MultiStepForm = () => {
         updateFields={updateFields}
         updateCourses={updateCourses}
       />,
-      <TimesForm key={3} {...data} updateFields={updateFields} />,
+      <TimesForm
+        key={3}
+        {...data}
+        updateFields={updateFields}
+        updatePreferredDuties={updatePreferredDuties}
+        updateAvailibility={updateAvailibility}
+      />,
     ]);
 
   const onSubmit = (event: FormEvent) => {

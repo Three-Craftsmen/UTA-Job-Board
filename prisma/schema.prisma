@@ -135,17 +135,20 @@ model Course {
 /// A Duty represents a possible choice for preferred duties
 model Duty {
     name     String        @id
+    order    Int           @unique(sort: Asc)
     pickedBy Application[]
 }
 
 /// Each OncampusBlock represents a half hour time segment of on-campus availability
 model OncampusBlock {
     time          String        @id
+    order         Int           @unique(sort: Asc)
     availableUTAs Application[]
 }
 
 /// Each OnlineBlock represents a half day time segment of online availability
 model OnlineBlock {
     time          String        @id
+    order         Int           @unique(sort: Asc)
     availableUTAs Application[]
 }

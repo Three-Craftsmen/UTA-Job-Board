@@ -143,6 +143,7 @@ model Duty {
 model OncampusBlock {
     time          String        @id
     order         Int           @unique(sort: Asc)
+    day           String?
     availableUTAs Application[]
 }
 
@@ -150,5 +151,6 @@ model OncampusBlock {
 model OnlineBlock {
     time          String        @id
     order         Int           @unique(sort: Asc)
+    day           String?
     availableUTAs Application[]
 }

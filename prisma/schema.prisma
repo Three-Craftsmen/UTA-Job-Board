@@ -83,7 +83,7 @@ model Example {
 
 /// Each Application represents an UTA application for a semester
 model Application {
-    id                   String          @id @default(cuid())
+    id                   String                @id @default(cuid())
     semester             String
     phoneNumber          String
     major                String
@@ -93,20 +93,20 @@ model Application {
     creditsLastSem       Int
     newUTA               Boolean
     prevUTAType          String?
-    prevUTACourses       Course[]        @relation("Course_prevUTACourses")
+    prevUTACourses       Course[]              @relation("Course_prevUTACourses")
     recommender          String?
     preferredProfs       String?
     essay                String?
-    user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId               String
-    preferredCourses     Course[]        @relation("Course_preferredCourses")
+    preferredCourses     Course[]              @relation("Course_preferredCourses")
     pickedCourses        PickedCourse[]
     preferredDuties      Duty[]
     minHours             Int
     maxHours             Int
     idealHours           Int
-    oncampusAvailability OncampusBlock[]
-    onlineAvailability   OnlineBlock[]
+    pickedOncampusBlocks PickedOncampusBlock[]
+    pickedOnlineBlocks   PickedOnlineBlock[]
 
     @@index([userId])
 }
@@ -139,18 +139,53 @@ model Duty {
     pickedBy Application[]
 }
 
+/// Day enum for timeslot days
+enum Day {
+    Sunday
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+}
+
+/// This inbetween model allows for a m-n relationship with a day attribute for each pair
+model PickedOncampusBlock {
+    day           Day
+    Application   Application   @relation(fields: [ApplicationId], references: [id], onDelete: Cascade)
+    ApplicationId String
+    OncampusBlock OncampusBlock @relation(fields: [time], references: [time], onDelete: Cascade)
+    time          String
+
+    @@id([ApplicationId, time, day])
+    @@index([ApplicationId])
+    @@index([time])
+}
+
 /// Each OncampusBlock represents a half hour time segment of on-campus availability
 model OncampusBlock {
-    time          String        @id
-    order         Int           @unique(sort: Asc)
-    day           String?
-    availableUTAs Application[]
+    time     String                @id
+    order    Int                   @unique(sort: Asc)
+    pickedBy PickedOncampusBlock[]
+}
+
+/// This inbetween model allows for a m-n relationship with a day attribute for each pair
+model PickedOnlineBlock {
+    day           Day
+    Application   Application @relation(fields: [ApplicationId], references: [id], onDelete: Cascade)
+    ApplicationId String
+    OnlineBlock   OnlineBlock @relation(fields: [time], references: [time], onDelete: Cascade)
+    time          String
+
+    @@id([ApplicationId, time, day])
+    @@index([ApplicationId])
+    @@index([time])
 }
 
 /// Each OnlineBlock represents a half day time segment of online availability
 model OnlineBlock {
-    time          String        @id
-    order         Int           @unique(sort: Asc)
-    day           String?
-    availableUTAs Application[]
+    time     String              @id
+    order    Int                 @unique(sort: Asc)
+    pickedBy PickedOnlineBlock[]
 }

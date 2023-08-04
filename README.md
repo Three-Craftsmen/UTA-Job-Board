@@ -1,1 +1,1 @@
-# Unnoficial GMU CS UTA Application Portal
+# Unofficial GMU CS UTA Application Portal
